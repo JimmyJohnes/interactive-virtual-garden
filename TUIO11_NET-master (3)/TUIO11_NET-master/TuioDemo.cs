@@ -50,6 +50,7 @@ public class TuioDemo : Form , TuioListener
 			public Rectangle Rect;
 			public string path_seeded;
 			public string State;
+			public string seed;
 			public int x;
 			public int y;
 		    public int width;
@@ -67,10 +68,10 @@ public class TuioDemo : Form , TuioListener
 		private int window_top = 0;
 		private int screen_width = Screen.PrimaryScreen.Bounds.Width;
 		private int screen_height = Screen.PrimaryScreen.Bounds.Height;
-
+			
 		private bool fullscreen;
 		private bool verbose;
-
+		
 		Font font = new Font("Arial", 10.0f);
 		SolidBrush fntBrush = new SolidBrush(Color.White);
 		SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0,0,64));
@@ -81,6 +82,17 @@ public class TuioDemo : Form , TuioListener
 
 		public TuioDemo(int port) {
 
+			int imgwidth = 90;
+			int imgheight = 90;
+			int y = 325;
+			Pot Pot1 = new Pot("POT 1.png", "H1.png", "S1.png", 50, y - 100, imgwidth + 200, imgheight + 200);
+			Pots.Add(Pot1);
+			Pot Pot2 = new Pot("POT 2.png", "H2.png", "S2.png", 440, y + 325, imgwidth + 200, imgheight + 200);
+			Pots.Add(Pot2);
+			Pot Pot3 = new Pot("POT 3.png", "H3.png", "S3.png", 1210, y + 325, imgwidth + 200, imgheight + 200);
+			Pots.Add(Pot3);
+			Pot Pot4 = new Pot("POT 4.png", "H4.png", "S4.png", 1550, y - 100, imgwidth + 200, imgheight + 200);
+			Pots.Add(Pot4);
 			verbose = false;
 			fullscreen = true;
 			width = window_width;
@@ -216,12 +228,13 @@ public class TuioDemo : Form , TuioListener
 
 		protected override void OnPaintBackground(PaintEventArgs pevent)
 		{
+			
 			// Getting the graphics object
 			Bitmap small_shovel = new Bitmap("small_shovel.png");
 			small_shovel.MakeTransparent();
 			Graphics g = pevent.Graphics;
 			g.DrawImage(Image.FromFile("background.jpg"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			int imgwidth = 90;
+			 int imgwidth = 90;
 			int imgheight = 90;
 			int y = 325;
 			Image img = Image.FromFile("PC.png");
@@ -239,14 +252,7 @@ public class TuioDemo : Form , TuioListener
 			// img = Image.FromFile("POT 4.png");
 			// g.DrawImage(img, new Rectangle(1550, y - 100, imgwidth + 200, imgheight + 200));
 
-			Pot Pot1 = new Pot("POT 1.png","H1.png","S1.png", 50, y - 100, imgwidth + 200, imgheight + 200);
-			Pots.Add(Pot1);
-	        Pot Pot2 = new Pot("POT 2.png", "H2.png", "S2.png", 440, y + 325, imgwidth + 200, imgheight + 200);
-		    Pots.Add(Pot2);
-			Pot Pot3 = new Pot("POT 3.png", "H3.png", "S3.png", 1210, y + 325, imgwidth + 200, imgheight + 200);
-			Pots.Add(Pot3);
-		    Pot Pot4 = new Pot("POT 4.png", "H4.png", "S4.png", 1550, y - 100, imgwidth + 200, imgheight + 200);
-	        Pots.Add(Pot4);
+			
 
         foreach (var pot in Pots)
         {
@@ -306,60 +312,29 @@ public class TuioDemo : Form , TuioListener
 						int size = height / 6;
 						if (tobj.SymbolID == 1)
 						{
-						Rectangle seedRect = new Rectangle(ox - size / 2, oy - size / 2, size, size);
-                        foreach (var pot in Pots)
-                        {
-                            if (seedRect.IntersectsWith(pot.Rect) && pot.State == "initial")
-                            {
-								pot.State = "dug";
-                                break;  
-                            }
-                        }
+							Rectangle seedRect = new Rectangle(ox - size / 4, oy - size / 4, size, size);
+							foreach (var pot in Pots)
+							{
+								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "initial")
+								{
+									pot.State = "dug";
+									break;  
+								}
+							}
 						}
 						if (tobj.SymbolID == 2)
 						{
-						Rectangle seedRect = new Rectangle(ox - size / 2, oy - size / 2, size, size);
-
-                        Rectangle seedlingRect;
-                        Pen pen = new Pen(Color.Green);
-
-                        switch (true)
-                        {
-                            case bool _ when seedRect.IntersectsWith(pot1):
-                                // Seed hits pot1, display a seedling on pot1
-                                seedlingRect = new Rectangle(pot1.X, pot1.Y - seedRect.Height, seedRect.Width, seedRect.Height);
-								// Code to draw the seedling on pot1								
-								g.DrawRectangle(pen,seedlingRect);
-                                break;
-
-                            case bool _ when seedRect.IntersectsWith(pot2):
-                                // Seed hits pot2, display a seedling on pot2
-                                seedlingRect = new Rectangle(pot2.X, pot2.Y - seedRect.Height, seedRect.Width, seedRect.Height);
-                                // Code to draw the seedling on pot2
-                                g.DrawRectangle(pen, seedlingRect);
-
-                                break;
-
-                            case bool _ when seedRect.IntersectsWith(pot3):
-                                // Seed hits pot3, display a seedling on pot3
-                                seedlingRect = new Rectangle(pot3.X, pot3.Y - seedRect.Height, seedRect.Width, seedRect.Height);
-                                // Code to draw the seedling on pot3
-                                g.DrawRectangle(pen, seedlingRect);
-
-                                break;
-
-                            case bool _ when seedRect.IntersectsWith(pot4):
-                                // Seed hits pot4, display a seedling on pot4
-                                seedlingRect = new Rectangle(pot4.X, pot4.Y - seedRect.Height, seedRect.Width, seedRect.Height);
-                                // Code to draw the seedling on pot4
-                                g.DrawRectangle(pen, seedlingRect);
-                                break;
-
-                            default:
-                                // If no pots are hit, continue normal behavior (e.g., draw the seed)
-                                break;
-                        }
-                    }
+						    Rectangle seedRect = new Rectangle(ox - size / 4, oy - size / 4, size, size);
+						    foreach (var pot in Pots)
+						    {
+						        if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+						        {
+						            pot.State = "seeded";
+									pot.seed = "pumkin";
+						            break;
+						        }
+						    }
+						}
                     switch (tobj.SymbolID)
                     {
                         case 1:
