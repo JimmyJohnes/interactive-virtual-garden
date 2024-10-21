@@ -207,6 +207,12 @@ public class TuioDemo : Form , TuioListener
 			img = Image.FromFile("pot4.png");
 			g.DrawImage(img, new Rectangle(480, y, imgwidth, imgheight));
 
+			Rectangle pot1 = new Rectangle(60, y, imgwidth, imgheight);
+			Rectangle pot2 = new Rectangle(200, y, imgwidth, imgheight);
+			Rectangle pot3 = new Rectangle(340, y, imgwidth, imgheight);
+			Rectangle pot4 = new Rectangle(480, y, imgwidth, imgheight);
+
+
 
         string objectImagePath;
 			string backgroundImagePath;
@@ -235,9 +241,50 @@ public class TuioDemo : Form , TuioListener
 						int ox = tobj.getScreenX(width);
 						int oy = tobj.getScreenY(height);
 						int size = height / 10;
+					if (tobj.SymbolID == 2)
+					{
+						Rectangle seedRect = new Rectangle(ox - size / 2, oy - size / 2, size, size);
+
+                        Rectangle seedlingRect;
+                        Pen pen = new Pen(Color.Green);
+
+                        switch (true)
+                        {
+                            case bool _ when seedRect.IntersectsWith(pot1):
+                                // Seed hits pot1, display a seedling on pot1
+                                seedlingRect = new Rectangle(pot1.X, pot1.Y - seedRect.Height, seedRect.Width, seedRect.Height);
+								// Code to draw the seedling on pot1
+								
+								g.DrawRectangle(pen,seedlingRect);
+                                break;
+
+                            case bool _ when seedRect.IntersectsWith(pot2):
+                                // Seed hits pot2, display a seedling on pot2
+                                seedlingRect = new Rectangle(pot2.X, pot2.Y - seedRect.Height, seedRect.Width, seedRect.Height);
+                                // Code to draw the seedling on pot2
+                                break;
+
+                            case bool _ when seedRect.IntersectsWith(pot3):
+                                // Seed hits pot3, display a seedling on pot3
+                                seedlingRect = new Rectangle(pot3.X, pot3.Y - seedRect.Height, seedRect.Width, seedRect.Height);
+                                // Code to draw the seedling on pot3
+                                break;
+
+                            case bool _ when seedRect.IntersectsWith(pot4):
+                                // Seed hits pot4, display a seedling on pot4
+                                seedlingRect = new Rectangle(pot4.X+5, pot4.Y - seedRect.Height, seedRect.Width, seedRect.Height);
+                                // Code to draw the seedling on pot4
+                                g.DrawRectangle(pen, seedlingRect);
+                                break;
+
+                            default:
+                                // If no pots are hit, continue normal behavior (e.g., draw the seed)
+                                break;
+                        }
+                    }
                     switch (tobj.SymbolID)
                     {
-                        case 6:
+                        case 1:
                             objectImagePath = Path.Combine(Environment.CurrentDirectory, "small_shovel.png");
 							
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg1.jpg");
