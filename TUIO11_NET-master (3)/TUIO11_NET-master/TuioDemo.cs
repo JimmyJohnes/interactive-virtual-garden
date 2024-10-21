@@ -27,16 +27,42 @@ using System.Threading;
 using TUIO;
 using System.IO;
 using System.Drawing.Drawing2D;
+using static TuioDemo;
+
 public class TuioDemo : Form , TuioListener
-{
+{ 
+		public class Pot
+		{
+			public Pot(string path_initial,string path_dug, string path_seeded, int x, int y, int width, int height, string State = "initial")
+			{
+				this.path_initial = path_initial;
+				this.path_dug_version = path_dug;
+				this.path_seeded = path_seeded;
+				this.Rect = new Rectangle (x,y,width,height);
+				this.x = x;
+				this.y = y;
+				this.width = width;
+				this.height = height;
+				this.State = State;
+			} 
+			public string path_initial;
+			public string path_dug_version;
+			public Rectangle Rect;
+			public string path_seeded;
+			public string State;
+			public int x;
+			public int y;
+		    public int width;
+			public int height;
+		}
     private TuioClient client;
-    private Dictionary<long,TuioObject> objectList;
+		private Dictionary<long,TuioObject> objectList;
 		private Dictionary<long,TuioCursor> cursorList;
 		private Dictionary<long,TuioBlob> blobList;
-
+		public List<Pot> Pots = new List<Pot>();
 		public static int width, height;
-		private int window_width =  640;
-		private int window_height = 480;
+		private int window_width =  1920;
+		private int window_height = 1080;
 		private int window_left = 0;
 		private int window_top = 0;
 		private int screen_width = Screen.PrimaryScreen.Bounds.Width;
@@ -54,9 +80,9 @@ public class TuioDemo : Form , TuioListener
 		Pen curPen = new Pen(new SolidBrush(Color.Blue), 1);
 
 		public TuioDemo(int port) {
-		
+
 			verbose = false;
-			fullscreen = false;
+			fullscreen = true;
 			width = window_width;
 			height = window_height;
 
@@ -193,24 +219,61 @@ public class TuioDemo : Form , TuioListener
 			// Getting the graphics object
 			Bitmap small_shovel = new Bitmap("small_shovel.png");
 			small_shovel.MakeTransparent();
-			Graphics g = pevent.Graphics;	
+			Graphics g = pevent.Graphics;
 			g.DrawImage(Image.FromFile("background.jpg"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			Image img = Image.FromFile("pot1.png");
-			int imgwidth =90;
+			int imgwidth = 90;
 			int imgheight = 90;
-			int y = 360;
-			g.DrawImage(img, new Rectangle(60, y, imgwidth, imgheight));
-			img = Image.FromFile("pot2.png");
-			g.DrawImage(img, new Rectangle(200, y, imgwidth, imgheight));
-			img = Image.FromFile("pot3.png");
-			g.DrawImage(img, new Rectangle(340, y, imgwidth, imgheight));
-			img = Image.FromFile("pot4.png");
-			g.DrawImage(img, new Rectangle(480, y, imgwidth, imgheight));
+			int y = 325;
+			Image img = Image.FromFile("PC.png");
+			g.DrawImage(img, new Rectangle(-4, y + 500, 1922, imgheight + 60));
+			img = Image.FromFile("PR.png");
+			g.DrawImage(img, new Rectangle(1470, y + 100, imgwidth + 400, imgheight + 60));
+			img = Image.FromFile("PL.png");
+			g.DrawImage(img, new Rectangle(0, y + 100, imgwidth + 370, imgheight + 60));
+			// img = Image.FromFile("POT 1.png");
+			// g.DrawImage(img, new Rectangle(50, y - 100, imgwidth + 200, imgheight + 200));
+			// img = Image.FromFile("POT 2.png");
+			// g.DrawImage(img, new Rectangle(440, y + 325, imgwidth + 200, imgheight + 200));
+			// img = Image.FromFile("POT 3.png");
+			// g.DrawImage(img, new Rectangle(1210, y + 325, imgwidth + 200, imgheight + 200));
+			// img = Image.FromFile("POT 4.png");
+			// g.DrawImage(img, new Rectangle(1550, y - 100, imgwidth + 200, imgheight + 200));
 
-			Rectangle pot1 = new Rectangle(60, y, imgwidth, imgheight);
-			Rectangle pot2 = new Rectangle(200, y, imgwidth, imgheight);
-			Rectangle pot3 = new Rectangle(340, y, imgwidth, imgheight);
-			Rectangle pot4 = new Rectangle(480, y, imgwidth, imgheight);
+			Pot Pot1 = new Pot("POT 1.png","H1.png","S1.png", 50, y - 100, imgwidth + 200, imgheight + 200);
+			Pots.Add(Pot1);
+	        Pot Pot2 = new Pot("POT 2.png", "H2.png", "S2.png", 440, y + 325, imgwidth + 200, imgheight + 200);
+		    Pots.Add(Pot2);
+			Pot Pot3 = new Pot("POT 3.png", "H3.png", "S3.png", 1210, y + 325, imgwidth + 200, imgheight + 200);
+			Pots.Add(Pot3);
+		    Pot Pot4 = new Pot("POT 4.png", "H4.png", "S4.png", 1550, y - 100, imgwidth + 200, imgheight + 200);
+	        Pots.Add(Pot4);
+
+        foreach (var pot in Pots)
+        {
+            switch (pot.State)
+            {
+                case "initial":
+                    {
+                        g.DrawImage(Image.FromFile(pot.path_initial), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+                        break;
+                    }
+                case "dug":
+                    {
+                        g.DrawImage(Image.FromFile(pot.path_dug_version), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+                        break;
+                    }
+                case "seeded":
+                    {
+                        g.DrawImage(Image.FromFile(pot.path_seeded), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+                        break;
+                    }
+            }
+        }
+
+			Rectangle pot1 = new Rectangle(50, y - 100, imgwidth + 200, imgheight  + 200);
+			Rectangle pot2 = new Rectangle(440, y + 325, imgwidth + 200, imgheight + 200);
+			Rectangle pot3 = new Rectangle(1210, y + 325, imgwidth + 200, imgheight + 200);
+			Rectangle pot4 = new Rectangle(1550, y - 100, imgwidth + 200, imgheight + 200);
 
 
 
@@ -240,9 +303,21 @@ public class TuioDemo : Form , TuioListener
 					foreach (TuioObject tobj in objectList.Values) {
 						int ox = tobj.getScreenX(width);
 						int oy = tobj.getScreenY(height);
-						int size = height / 10;
-					if (tobj.SymbolID == 2)
-					{
+						int size = height / 6;
+						if (tobj.SymbolID == 1)
+						{
+						Rectangle seedRect = new Rectangle(ox - size / 2, oy - size / 2, size, size);
+                        foreach (var pot in Pots)
+                        {
+                            if (seedRect.IntersectsWith(pot.Rect) && pot.State == "initial")
+                            {
+								pot.State = "dug";
+                                break;  
+                            }
+                        }
+						}
+						if (tobj.SymbolID == 2)
+						{
 						Rectangle seedRect = new Rectangle(ox - size / 2, oy - size / 2, size, size);
 
                         Rectangle seedlingRect;
@@ -253,8 +328,7 @@ public class TuioDemo : Form , TuioListener
                             case bool _ when seedRect.IntersectsWith(pot1):
                                 // Seed hits pot1, display a seedling on pot1
                                 seedlingRect = new Rectangle(pot1.X, pot1.Y - seedRect.Height, seedRect.Width, seedRect.Height);
-								// Code to draw the seedling on pot1
-								
+								// Code to draw the seedling on pot1								
 								g.DrawRectangle(pen,seedlingRect);
                                 break;
 
@@ -262,17 +336,21 @@ public class TuioDemo : Form , TuioListener
                                 // Seed hits pot2, display a seedling on pot2
                                 seedlingRect = new Rectangle(pot2.X, pot2.Y - seedRect.Height, seedRect.Width, seedRect.Height);
                                 // Code to draw the seedling on pot2
+                                g.DrawRectangle(pen, seedlingRect);
+
                                 break;
 
                             case bool _ when seedRect.IntersectsWith(pot3):
                                 // Seed hits pot3, display a seedling on pot3
                                 seedlingRect = new Rectangle(pot3.X, pot3.Y - seedRect.Height, seedRect.Width, seedRect.Height);
                                 // Code to draw the seedling on pot3
+                                g.DrawRectangle(pen, seedlingRect);
+
                                 break;
 
                             case bool _ when seedRect.IntersectsWith(pot4):
                                 // Seed hits pot4, display a seedling on pot4
-                                seedlingRect = new Rectangle(pot4.X+5, pot4.Y - seedRect.Height, seedRect.Width, seedRect.Height);
+                                seedlingRect = new Rectangle(pot4.X, pot4.Y - seedRect.Height, seedRect.Width, seedRect.Height);
                                 // Code to draw the seedling on pot4
                                 g.DrawRectangle(pen, seedlingRect);
                                 break;
@@ -301,7 +379,7 @@ public class TuioDemo : Form , TuioListener
                             break;
                         default:
                             // Use default rectangle for other IDs
-                            g.FillRectangle(objBrush, new Rectangle(ox - size / 2, oy - size / 2, size, size));
+                            g.FillRectangle(objBrush, new Rectangle(ox - size, oy - size, size, size));
                             g.DrawString(tobj.SymbolID + "", font, fntBrush, new PointF(ox - 10, oy - 10));
                             continue;
                     }
@@ -327,7 +405,7 @@ public class TuioDemo : Form , TuioListener
                                 g.TranslateTransform(-ox, -oy);
 
                                 // Draw the rotated object
-                                g.DrawImage(objectImage, new Rectangle(ox - size / 2, oy - size / 2, size, size));
+                                g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
 
                                 // Restore the graphics state
                                 g.Restore(state);
@@ -337,7 +415,7 @@ public class TuioDemo : Form , TuioListener
                         {
                             Console.WriteLine($"Object image not found: {objectImagePath}");
                             // Fall back to drawing a rectangle
-                            g.FillRectangle(objBrush, new Rectangle(ox - size / 2, oy - size / 2, size, size));
+                            g.FillRectangle(objBrush, new Rectangle(ox - size, oy - size, size, size));
                         }
 					}
 					catch {
@@ -381,7 +459,13 @@ public class TuioDemo : Form , TuioListener
             // 
             this.ClientSize = new System.Drawing.Size(441, 290);
             this.Name = "TuioDemo";
+            this.Load += new System.EventHandler(this.TuioDemo_Load);
             this.ResumeLayout(false);
+
+    }
+
+    private void TuioDemo_Load(object sender, EventArgs e)
+    {
 
     }
 
