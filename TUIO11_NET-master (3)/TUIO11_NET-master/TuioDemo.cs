@@ -277,21 +277,21 @@ public class TuioDemo : Form , TuioListener
 				case "watered":
 					{
 						g.DrawImage(Image.FromFile(pot.path_initial), new Rectangle(pot.x, pot.y, pot.width, pot.height));
-						if (pot.WateringNo == 1) 
-						{
-							g.DrawImage(Image.FromFile("LVL1.png"), new Rectangle(pot.x, pot.y-pot.height/2, pot.width, pot.height));
-						}
-                        if (pot.WateringNo == 2)
+                        if (pot.WateringNo < 10 && pot.WateringNo >= 0)
                         {
-                            g.DrawImage(Image.FromFile("LVL2.png"), new Rectangle(pot.x, pot.y - pot.height/2, pot.width, pot.height));
+                            g.DrawImage(Image.FromFile("LVL1.png"), new Rectangle(pot.x, pot.y - pot.height, pot.width/2, pot.height/2));
                         }
-                        if (pot.WateringNo == 3)
+                        if (pot.WateringNo < 20 && pot.WateringNo >= 10)
                         {
-                            g.DrawImage(Image.FromFile("LVL3.png"), new Rectangle(pot.x, pot.y - pot.height/2, pot.width, pot.height));
+                            g.DrawImage(Image.FromFile("LVL2.png"), new Rectangle(pot.x, pot.y - pot.height, pot.width, pot.height));
                         }
-                        if (pot.WateringNo == 4)
+                        if (pot.WateringNo < 30 && pot.WateringNo >= 20)
                         {
-                            g.DrawImage(Image.FromFile("LVL4.png"), new Rectangle(pot.x, pot.y - pot.height/2, pot.width, pot.height));
+                            g.DrawImage(Image.FromFile("LVL3.png"), new Rectangle(pot.x, pot.y - pot.height, pot.width, pot.height));
+                        }
+                        if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
+                        {
+                            g.DrawImage(Image.FromFile("LVL4.png"), new Rectangle(pot.x, pot.y - pot.height, pot.width, pot.height));
                         }
                         break;					
 					}
@@ -363,11 +363,12 @@ public class TuioDemo : Form , TuioListener
 					        Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
 					        foreach (var pot in Pots)
 					        {
+								
 					            if (seedRect.IntersectsWith(pot.Rect) && pot.State == "seeded" || pot.State == "watered")
 					            {
 					                pot.State = "watered";
-									if (pot.WateringNo < 4){
-									pot.WateringNo++;
+									if (pot.WateringNo < 40){
+										pot.WateringNo++;
 									}
 					                break;
 					            }
