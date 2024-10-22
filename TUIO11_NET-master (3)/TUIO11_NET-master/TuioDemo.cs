@@ -51,6 +51,7 @@ public class TuioDemo : Form , TuioListener
 			public string path_seeded;
 			public string State;
 			public string seed;
+			public int WateringNo;
 			public int x;
 			public int y;
 		    public int width;
@@ -337,18 +338,18 @@ public class TuioDemo : Form , TuioListener
 						}
                     switch (tobj.SymbolID)
                     {
-                        case 1:
+                        case 0:
                             objectImagePath = Path.Combine(Environment.CurrentDirectory, "small_shovel.png");
 							
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg1.jpg");
                             break;
-                        case 2:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "seed1.png");
+                        case 1:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "SEEDS.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg2.jpg");
                             break;
-                        case 0:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "pngegg_3.png");
+                        case 2:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WATER.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
