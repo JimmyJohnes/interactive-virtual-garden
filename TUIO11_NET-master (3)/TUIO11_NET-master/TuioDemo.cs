@@ -311,7 +311,7 @@ public class TuioDemo : Form , TuioListener
 						int ox = tobj.getScreenX(width);
 						int oy = tobj.getScreenY(height);
 						int size = height / 6;
-						if (tobj.SymbolID == 1)
+						if (tobj.SymbolID == 0)
 						{
 							Rectangle seedRect = new Rectangle(ox - size / 4, oy - size / 4, size, size);
 							foreach (var pot in Pots)
@@ -323,9 +323,9 @@ public class TuioDemo : Form , TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 2)
+						if (tobj.SymbolID == 1)
 						{
-						    Rectangle seedRect = new Rectangle(ox - size / 4, oy - size / 4, size, size);
+						    Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
 						    foreach (var pot in Pots)
 						    {
 						        if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
@@ -336,6 +336,19 @@ public class TuioDemo : Form , TuioListener
 						        }
 						    }
 						}
+					    if (tobj.SymbolID == 2)
+					    {
+					        Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+					        foreach (var pot in Pots)
+					        {
+					            if (seedRect.IntersectsWith(pot.Rect) && pot.State == "seeded" || pot.State == "watered")
+					            {
+					                pot.State = "watered";
+									pot.WateringNo++;
+					                break;
+					            }
+					        }
+					    }
                     switch (tobj.SymbolID)
                     {
                         case 0:
@@ -380,9 +393,16 @@ public class TuioDemo : Form , TuioListener
                                 g.RotateTransform((float)(tobj.Angle / Math.PI * 180.0f));
                                 g.TranslateTransform(-ox, -oy);
 
-                                // Draw the rotated object
-                                g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
+								// Draw the rotated object
+								if (tobj.SymbolID == 1)
+								{
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size / 4, size / 4));
 
+								}
+								else
+								{
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
+								}
                                 // Restore the graphics state
                                 g.Restore(state);
                             }
