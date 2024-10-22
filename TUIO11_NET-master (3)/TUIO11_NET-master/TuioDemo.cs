@@ -390,8 +390,14 @@ public class TuioDemo : Form , TuioListener
                         case 2:
                             objectImagePath = Path.Combine(Environment.CurrentDirectory, "WATER.png");
 
+							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+							break;
+                        case 3:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "HOE.png");
+
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
+
                         default:
                             // Use default rectangle for other IDs
                             g.FillRectangle(objBrush, new Rectangle(ox - size, oy - size, size, size));
