@@ -375,6 +375,18 @@ public class TuioDemo : Form , TuioListener
 					            }
 					        }
 					    }
+						if (tobj.SymbolID == 3)
+						{
+						    Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
+						    foreach (var pot in Pots)
+						    {
+						        if (seedRect.IntersectsWith(pot.Rect) && pot.State == "watered" && pot.WateringNo >= 30)
+						        {
+						            pot.State = "initial";
+						            break;
+						        }
+						    }
+						}
                     switch (tobj.SymbolID)
                     {
                         case 0:
@@ -431,7 +443,7 @@ public class TuioDemo : Form , TuioListener
 									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size / 4, size / 4));
 
 								}
-                                if (tobj.SymbolID == 2)
+                                else if (tobj.SymbolID == 2)
                                 {
                                     g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size + 100 , size + 100));
 
