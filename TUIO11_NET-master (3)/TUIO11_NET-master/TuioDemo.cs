@@ -69,10 +69,10 @@ public class TuioDemo : Form , TuioListener
 		private int window_top = 0;
 		private int screen_width = Screen.PrimaryScreen.Bounds.Width;
 		private int screen_height = Screen.PrimaryScreen.Bounds.Height;
-			
+		public int Score;
 		private bool fullscreen;
 		private bool verbose;
-		
+	private Label displayLabel;
 		Font font = new Font("Arial", 10.0f);
 		SolidBrush fntBrush = new SolidBrush(Color.White);
 		SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0,0,64));
@@ -98,7 +98,14 @@ public class TuioDemo : Form , TuioListener
 			fullscreen = true;
 			width = window_width;
 			height = window_height;
-
+			displayLabel = new Label();
+			displayLabel.Text = Score.ToString();
+			displayLabel.Location = new System.Drawing.Point(965, 50);
+			displayLabel.AutoSize = true;
+			displayLabel.MinimumSize = new System.Drawing.Size(100, 50);
+			displayLabel.Font = new Font("Arial", 24);
+			displayLabel.TextAlign = ContentAlignment.MiddleCenter;
+			this.Controls.Add(displayLabel);
 			this.ClientSize = new System.Drawing.Size(width, height);
 			this.Name = "TuioDemo";
 			this.Text = "TuioDemo";
@@ -238,20 +245,14 @@ public class TuioDemo : Form , TuioListener
 			 int imgwidth = 90;
 			int imgheight = 90;
 			int y = 325;
-			Image img = Image.FromFile("PC.png");
+	        displayLabel.Text = Score.ToString();
+		    Image img = Image.FromFile("PC.png");
 			g.DrawImage(img, new Rectangle(-4, y + 500, 1922, imgheight + 60));
 			img = Image.FromFile("PR.png");
 			g.DrawImage(img, new Rectangle(1470, y + 100, imgwidth + 400, imgheight + 60));
 			img = Image.FromFile("PL.png");
 			g.DrawImage(img, new Rectangle(0, y + 100, imgwidth + 370, imgheight + 60));
-			// img = Image.FromFile("POT 1.png");
-			// g.DrawImage(img, new Rectangle(50, y - 100, imgwidth + 200, imgheight + 200));
-			// img = Image.FromFile("POT 2.png");
-			// g.DrawImage(img, new Rectangle(440, y + 325, imgwidth + 200, imgheight + 200));
-			// img = Image.FromFile("POT 3.png");
-			// g.DrawImage(img, new Rectangle(1210, y + 325, imgwidth + 200, imgheight + 200));
-			// img = Image.FromFile("POT 4.png");
-			// g.DrawImage(img, new Rectangle(1550, y - 100, imgwidth + 200, imgheight + 200));
+			
 
 			
 
@@ -297,14 +298,10 @@ public class TuioDemo : Form , TuioListener
                         break;					
 					}
 
-            } 
+				} 
         }
 
-			Rectangle pot1 = new Rectangle(50, y - 100, imgwidth + 200, imgheight  + 200);
-			Rectangle pot2 = new Rectangle(440, y + 325, imgwidth + 200, imgheight + 200);
-			Rectangle pot3 = new Rectangle(1210, y + 325, imgwidth + 200, imgheight + 200);
-			Rectangle pot4 = new Rectangle(1550, y - 100, imgwidth + 200, imgheight + 200);
-
+			
 
 
         string objectImagePath;
@@ -383,6 +380,8 @@ public class TuioDemo : Form , TuioListener
 						        if (seedRect.IntersectsWith(pot.Rect) && pot.State == "watered" && pot.WateringNo >= 30)
 						        {
 						            pot.State = "initial";
+									pot.WateringNo = 0;
+									Score += 100;
 						            break;
 						        }
 						    }
