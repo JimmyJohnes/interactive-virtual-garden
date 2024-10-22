@@ -274,7 +274,29 @@ public class TuioDemo : Form , TuioListener
                         g.DrawImage(Image.FromFile(pot.path_seeded), new Rectangle(pot.x, pot.y, pot.width, pot.height));
                         break;
                     }
-            }
+				case "watered":
+					{
+						g.DrawImage(Image.FromFile(pot.path_initial), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+						if (pot.WateringNo == 1) 
+						{
+							g.DrawImage(Image.FromFile("LVL1.png"), new Rectangle(pot.x, pot.y-pot.height/2, pot.width, pot.height));
+						}
+                        if (pot.WateringNo == 2)
+                        {
+                            g.DrawImage(Image.FromFile("LVL2.png"), new Rectangle(pot.x, pot.y - pot.height/2, pot.width, pot.height));
+                        }
+                        if (pot.WateringNo == 3)
+                        {
+                            g.DrawImage(Image.FromFile("LVL3.png"), new Rectangle(pot.x, pot.y - pot.height/2, pot.width, pot.height));
+                        }
+                        if (pot.WateringNo == 4)
+                        {
+                            g.DrawImage(Image.FromFile("LVL4.png"), new Rectangle(pot.x, pot.y - pot.height/2, pot.width, pot.height));
+                        }
+                        break;					
+					}
+
+            } 
         }
 
 			Rectangle pot1 = new Rectangle(50, y - 100, imgwidth + 200, imgheight  + 200);
@@ -344,7 +366,9 @@ public class TuioDemo : Form , TuioListener
 					            if (seedRect.IntersectsWith(pot.Rect) && pot.State == "seeded" || pot.State == "watered")
 					            {
 					                pot.State = "watered";
+									if (pot.WateringNo < 4){
 									pot.WateringNo++;
+									}
 					                break;
 					            }
 					        }
