@@ -30,14 +30,15 @@ using System.Drawing.Drawing2D;
 using static TuioDemo;
 
 public class TuioDemo : Form , TuioListener
-{ 
+{
+	public int scene=1;
+			
 		public class Pot
 		{
-			public Pot(string path_initial,string path_dug, string path_seeded, int x, int y, int width, int height, string State = "initial")
+			public Pot(string path_initial,string path_dug, int x, int y, int width, int height, string State = "initial")
 			{
 				this.path_initial = path_initial;
 				this.path_dug_version = path_dug;
-				this.path_seeded = path_seeded;
 				this.Rect = new Rectangle (x,y,width,height);
 				this.x = x;
 				this.y = y;
@@ -73,7 +74,7 @@ public class TuioDemo : Form , TuioListener
 		private bool fullscreen;
 		private bool verbose;
 	private Label displayLabel;
-		Font font = new Font("Arial", 10.0f);
+		Font font = new Font("Minecraft", 10.0f);
 		SolidBrush fntBrush = new SolidBrush(Color.White);
 		SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0,0,64));
 		SolidBrush curBrush = new SolidBrush(Color.FromArgb(192, 0, 192));
@@ -81,18 +82,17 @@ public class TuioDemo : Form , TuioListener
 		SolidBrush blbBrush = new SolidBrush(Color.FromArgb(64, 64, 64));
 		Pen curPen = new Pen(new SolidBrush(Color.Blue), 1);
 
-		public TuioDemo(int port) {
+	public TuioDemo(int port) {
 
-			int imgwidth = 90;
-			int imgheight = 90;
-			int y = 325;
-			Pot Pot1 = new Pot("POT 1.png", "H1.png", "S1.png", 50, y - 100, imgwidth + 200, imgheight + 200);
-			Pots.Add(Pot1);
-			Pot Pot2 = new Pot("POT 2.png", "H2.png", "S2.png", 440, y + 325, imgwidth + 200, imgheight + 200);
-			Pots.Add(Pot2);
-			Pot Pot3 = new Pot("POT 3.png", "H3.png", "S3.png", 1210, y + 325, imgwidth + 200, imgheight + 200);
-			Pots.Add(Pot3);
-			Pot Pot4 = new Pot("POT 4.png", "H4.png", "S4.png", 1550, y - 100, imgwidth + 200, imgheight + 200);
+	
+		int y = 325;
+			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width+125,this.Height+60);
+			Pots.Add(Pot1);		
+			Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657,  this.Width+5, this.Height+45);
+			Pots.Add(Pot2);		
+			Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width+5, this.Height+45);
+			Pots.Add(Pot3);		
+			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60);
 			Pots.Add(Pot4);
 			verbose = false;
 			fullscreen = true;
@@ -103,16 +103,17 @@ public class TuioDemo : Form , TuioListener
 			displayLabel.Location = new System.Drawing.Point(965, 50);
 			displayLabel.AutoSize = true;
 			displayLabel.MinimumSize = new System.Drawing.Size(100, 50);
-			displayLabel.Font = new Font("Arial", 24);
+			displayLabel.Font = new Font("Minecraft", 30);
 			displayLabel.TextAlign = ContentAlignment.MiddleCenter;
 			this.Controls.Add(displayLabel);
 			this.ClientSize = new System.Drawing.Size(width, height);
 			this.Name = "TuioDemo";
 			this.Text = "TuioDemo";
+			this.FormBorderStyle = FormBorderStyle.None;    
+		    this.WindowState = FormWindowState.Maximized;   
 			
-			this.Closing+=new CancelEventHandler(Form_Closing);
-			this.KeyDown+=new KeyEventHandler(Form_KeyDown);
 
+            this.Closing+=new CancelEventHandler(Form_Closing);
 			this.SetStyle( ControlStyles.AllPaintingInWmPaint |
 							ControlStyles.UserPaint |
 							ControlStyles.DoubleBuffer, true);
@@ -127,45 +128,7 @@ public class TuioDemo : Form , TuioListener
 			client.connect();
 		}
 
-		private void Form_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e) {
-
- 			if ( e.KeyData == Keys.F1) {
-	 			if (fullscreen == false) {
-
-					width = screen_width;
-					height = screen_height;
-
-					window_left = this.Left;
-					window_top = this.Top;
-
-					this.FormBorderStyle = FormBorderStyle.None;
-		 			this.Left = 0;
-		 			this.Top = 0;
-		 			this.Width = screen_width;
-		 			this.Height = screen_height;
-
-		 			fullscreen = true;
-	 			} else {
-
-					width = window_width;
-					height = window_height;
-
-		 			this.FormBorderStyle = FormBorderStyle.Sizable;
-		 			this.Left = window_left;
-		 			this.Top = window_top;
-		 			this.Width = window_width;
-		 			this.Height = window_height;
-
-		 			fullscreen = false;
-	 			}
- 			} else if ( e.KeyData == Keys.Escape) {
-				this.Close();
-
- 			} else if ( e.KeyData == Keys.V ) {
- 				verbose=!verbose;
- 			}
-
- 		}
+		
 
 		private void Form_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
@@ -175,8 +138,10 @@ public class TuioDemo : Form , TuioListener
 			System.Environment.Exit(0);
 		}
 
-		public void addTuioObject(TuioObject o) {
-			lock(objectList) {
+		public void addTuioObject(TuioObject o)
+		{
+			lock(objectList) 
+			{
 				objectList.Add(o.SessionID,o);
 			} if (verbose) Console.WriteLine("add obj "+o.SymbolID+" ("+o.SessionID+") "+o.X+" "+o.Y+" "+o.Angle);
 		}
@@ -238,20 +203,22 @@ public class TuioDemo : Form , TuioListener
 		{
 			
 			// Getting the graphics object
-			Bitmap small_shovel = new Bitmap("small_shovel.png");
+			Bitmap small_shovel = new Bitmap("SHOVEL.png");
 			small_shovel.MakeTransparent();
 			Graphics g = pevent.Graphics;
-			g.DrawImage(Image.FromFile("background.jpg"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			 int imgwidth = 90;
+		if (scene == 0)
+		{
+			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
+		}
+		else
+		{
+            g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+
+        }
+			int imgwidth = 90;
 			int imgheight = 90;
 			int y = 325;
-	        displayLabel.Text = Score.ToString();
-		    Image img = Image.FromFile("PC.png");
-			g.DrawImage(img, new Rectangle(-4, y + 500, 1922, imgheight + 60));
-			img = Image.FromFile("PR.png");
-			g.DrawImage(img, new Rectangle(1470, y + 100, imgwidth + 400, imgheight + 60));
-			img = Image.FromFile("PL.png");
-			g.DrawImage(img, new Rectangle(0, y + 100, imgwidth + 370, imgheight + 60));
+			displayLabel.Text = Score.ToString();
 			
 
 			
@@ -278,7 +245,6 @@ public class TuioDemo : Form , TuioListener
 				case "watered":
 					{
                         g.DrawImage(Image.FromFile(pot.path_seeded), new Rectangle(pot.x, pot.y, pot.width, pot.height));
-
                         if (pot.WateringNo < 10 && pot.WateringNo >= 0)
                         {
                             g.DrawImage(Image.FromFile("LVL1.png"), new Rectangle(pot.x + 70, pot.y -100, pot.width/2, pot.height/2));
@@ -301,28 +267,31 @@ public class TuioDemo : Form , TuioListener
 				} 
         }
 
-			
 
 
         string objectImagePath;
 			string backgroundImagePath;
             // draw the cursor path
-            if (cursorList.Count > 0) {
- 			 lock(cursorList) {
-			 foreach (TuioCursor tcur in cursorList.Values) {
+            if (cursorList.Count > 0)
+			{
+ 				lock(cursorList) 
+				{
+					foreach (TuioCursor tcur in cursorList.Values) 
+					{
 					List<TuioPoint> path = tcur.Path;
 					TuioPoint current_point = path[0];
 
-					for (int i = 0; i < path.Count; i++) {
+					for (int i = 0; i < path.Count; i++) 
+					{
 						TuioPoint next_point = path[i];
 						g.DrawLine(curPen, current_point.getScreenX(width), current_point.getScreenY(height), next_point.getScreenX(width), next_point.getScreenY(height));
 						current_point = next_point;
 					}
 					g.FillEllipse(curBrush, current_point.getScreenX(width) - height / 100, current_point.getScreenY(height) - height / 100, height / 50, height / 50);
 					g.DrawString(tcur.CursorID + "", font, fntBrush, new PointF(tcur.getScreenX(width) - 10, tcur.getScreenY(height) - 10));
+					}
 				}
 			}
-		 }
 
 			// draw the objects
 			if (objectList.Count > 0) {
