@@ -90,8 +90,8 @@ load_templates()
 
 # Define the video and label for the gesture
 vid1 = r"C:\Users\Qasem\Desktop\Interactive-virtual-garden\peace.mp4"
-points1 = getPoints(vid1, "Peace")
-tmpl_peace = Template("Peace", points1)
+points1 = getPoints(vid1, "peace")
+tmpl_peace = Template("peace", points1)
 
 # Check if the template already exists before adding
 if not any(tmpl.name == tmpl_peace.name for tmpl in templates):
