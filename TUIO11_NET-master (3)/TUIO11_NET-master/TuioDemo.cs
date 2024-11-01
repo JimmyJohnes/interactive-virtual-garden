@@ -27,13 +27,31 @@ using System.Threading;
 using TUIO;
 using System.IO;
 using System.Drawing.Drawing2D;
+using MongoDBOperations;
 using static TuioDemo;
+using MongoDB.Bson;
+using System.Net.Mail;
+using System.Data.SqlClient;
 
 public class TuioDemo : Form , TuioListener
 {
-	public int scene=1;
-			
-		public class Pot
+    //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+    private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
+    public int scene=1;
+
+    public void AddUserMacAddress(string macAddress)
+    {
+        // Create a BsonDocument with the MAC address
+        var document = new BsonDocument
+        {
+            { "mac_address", "38:65:B2:D9:A7:DA"}
+        };
+
+        // Call the InsertDocument method to add the document to the "users" collection
+        mongoDbOps.InsertDocument("users", document);
+    }
+
+    public class Pot
 		{
 			public Pot(string path_initial,string path_dug, int x, int y, int width, int height, string State = "initial")
 			{
@@ -84,8 +102,10 @@ public class TuioDemo : Form , TuioListener
 
 	public TuioDemo(int port) {
 
-	
-		int y = 325;
+        //AddUserMacAddress("38:65:B2:D9:A7:DA");
+
+
+        int y = 325;
 			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width+125,this.Height+60);
 			Pots.Add(Pot1);		
 			Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657,  this.Width+5, this.Height+45);
@@ -463,7 +483,6 @@ public class TuioDemo : Form , TuioListener
 				}
 			}
 		}
-
     private void InitializeComponent()
     {
             this.SuspendLayout();
