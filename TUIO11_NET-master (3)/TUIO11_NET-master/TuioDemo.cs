@@ -55,7 +55,7 @@ public class TuioDemo : Form , TuioListener
 
     public class Pot
 		{
-			public Pot(string path_initial,string path_dug, int x, int y, int width, int height,string position,string State = "initial")
+			public Pot(string path_initial,string path_dug, int x, int y, int width, int height,string position,int phase = 1,string State = "initial")
 			{
 				this.path_initial = path_initial;
 				this.path_dug_version = path_dug;
@@ -66,6 +66,7 @@ public class TuioDemo : Form , TuioListener
 				this.height = height;
 				this.State = State;
 				this.position = position;
+				this.phase = phase;
 			} 
 			public string path_initial;
 			public string path_dug_version;
@@ -75,6 +76,7 @@ public class TuioDemo : Form , TuioListener
 			public string seed;
 			public string position;
 			public int WateringNo;
+			public int phase;
 			public int x;
 			public int y;
 		    public int width;
@@ -103,7 +105,13 @@ public class TuioDemo : Form , TuioListener
 		SolidBrush objBrush = new SolidBrush(Color.FromArgb(64, 0, 0));
 		SolidBrush blbBrush = new SolidBrush(Color.FromArgb(64, 64, 64));
 		Pen curPen = new Pen(new SolidBrush(Color.Blue), 1);
-
+	public bool Intersect(Rectangle tool, Rectangle item)
+	{
+		if(tool.X > item.X && tool.Y > item.Y && tool.X < item.X + item.Width && tool.Y < item.Y + item.Height/5) {
+			return true; 
+		}
+		return false;
+	}
 	public TuioDemo(int port) {
 
         //AddUserMacAddress("38:65:B2:D9:A7:DA");
@@ -114,9 +122,9 @@ public class TuioDemo : Form , TuioListener
 			Pots.Add(Pot1);		
 			Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657,  this.Width+5, this.Height+45, "LC");
 			Pots.Add(Pot2);		
-			Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width+5, this.Height+45, "R");
+			Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width+5, this.Height+45, "RC");
 			Pots.Add(Pot3);		
-			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60, "RC");
+			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60, "R");
 			Pots.Add(Pot4);
 			verbose = false;
 			fullscreen = true;
@@ -226,13 +234,13 @@ public class TuioDemo : Form , TuioListener
 
 		protected override void OnPaintBackground(PaintEventArgs pevent)
 		{
-
+			
 		// Getting the graphics object
 			if(small_shovel == null)
 			{
              small_shovel = new Bitmap("SHOVEL.png");
 			}
-        small_shovel.MakeTransparent();
+			small_shovel.MakeTransparent();
 			Graphics g = pevent.Graphics;
 			g.Clear(Color.White);
 		if (scene == 0)
@@ -268,7 +276,7 @@ public class TuioDemo : Form , TuioListener
                     }
                 case "seeded":
                     {
-                        g.DrawImage(Image.FromFile(pot.path_seeded), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+                        g.DrawImage(Image.FromFile("P"+pot.seed+pot.position+pot.phase+".png"), new Rectangle(pot.x, pot.y, pot.width, pot.height));
                         break;
                     }
 				case "watered":
@@ -298,7 +306,7 @@ public class TuioDemo : Form , TuioListener
 
 
 
-        string objectImagePath;
+			string objectImagePath;
 			string backgroundImagePath;
             // draw the cursor path
             if (cursorList.Count > 0)
@@ -334,7 +342,7 @@ public class TuioDemo : Form , TuioListener
 							Rectangle seedRect = new Rectangle(ox - size / 4, oy - size / 4, size, size);
 							foreach (var pot in Pots)
 							{
-								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "initial")
+								if (Intersect(seedRect, pot.Rect)  && pot.State == "initial")
 								{
 									pot.State = "dug";
 									break;  
@@ -348,7 +356,7 @@ public class TuioDemo : Form , TuioListener
 					        foreach (var pot in Pots)
 					        {
 								
-					            if (seedRect.IntersectsWith(pot.Rect) && pot.State == "seeded" || pot.State == "watered")
+					            if (Intersect(seedRect,pot.Rect) && pot.State == "seeded" || pot.State == "watered")
 					            {
 					                pot.State = "watered";
 									if (pot.WateringNo < 40){
@@ -363,7 +371,7 @@ public class TuioDemo : Form , TuioListener
 						    Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 						    foreach (var pot in Pots)
 						    {
-						        if (seedRect.IntersectsWith(pot.Rect) && pot.State == "watered" && pot.WateringNo >= 30)
+						        if (Intersect(seedRect, pot.Rect) && pot.State == "watered" && pot.WateringNo >= 30)
 						        {
 						            pot.State = "initial";
 									pot.WateringNo = 0;
@@ -377,7 +385,7 @@ public class TuioDemo : Form , TuioListener
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
 							foreach (var pot in Pots)
 							{
-								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
 								{
 									pot.State = "seeded";
 									pot.seed = "B";
@@ -390,7 +398,7 @@ public class TuioDemo : Form , TuioListener
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
 							foreach (var pot in Pots)
 							{
-								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
 								{
 									pot.State = "seeded";
 									pot.seed = "W";
@@ -403,7 +411,7 @@ public class TuioDemo : Form , TuioListener
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
 							foreach (var pot in Pots)
 							{
-								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
 								{
 									pot.State = "seeded";
 									pot.seed = "C";
@@ -416,7 +424,7 @@ public class TuioDemo : Form , TuioListener
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
 							foreach (var pot in Pots)
 							{
-								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
 							 {
 							     pot.State = "seeded";
 								    pot.seed = "P";
@@ -429,7 +437,7 @@ public class TuioDemo : Form , TuioListener
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
 							foreach (var pot in Pots)
 							{
-								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
 								{
 									pot.State = "seeded";
 									pot.seed = "R";
@@ -445,17 +453,37 @@ public class TuioDemo : Form , TuioListener
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg1.jpg");
                             break;
                         case 1:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "SEEDS.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WATER.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg2.jpg");
                             break;
                         case 2:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WATER.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "H1.png");
 
 							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
 							break;
                         case 3:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "HOE.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "Bseed.png");
+
+                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+                            break;
+                        case 4:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "Wseed.png");
+
+                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+                            break;
+                        case 5:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "carrot.png");
+
+                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+                            break;
+                        case 6:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "potato.png");
+
+                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+                            break;
+                        case 7:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "berry.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
@@ -544,6 +572,7 @@ public class TuioDemo : Form , TuioListener
 					}
 				}
 			}
+
 		}
     private void InitializeComponent()
     {
