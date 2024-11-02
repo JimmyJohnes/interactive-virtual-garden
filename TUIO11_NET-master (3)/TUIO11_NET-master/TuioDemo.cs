@@ -32,13 +32,15 @@ using static TuioDemo;
 using MongoDB.Bson;
 using System.Net.Mail;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 
 public class TuioDemo : Form , TuioListener
 {
     //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
     public int scene=1;
-
+    public Bitmap small_shovel;
+	public Bitmap objectImage;
     public void AddUserMacAddress(string macAddress)
     {
         // Create a BsonDocument with the MAC address
@@ -53,7 +55,7 @@ public class TuioDemo : Form , TuioListener
 
     public class Pot
 		{
-			public Pot(string path_initial,string path_dug, int x, int y, int width, int height, string State = "initial")
+			public Pot(string path_initial,string path_dug, int x, int y, int width, int height,string position,string State = "initial")
 			{
 				this.path_initial = path_initial;
 				this.path_dug_version = path_dug;
@@ -63,6 +65,7 @@ public class TuioDemo : Form , TuioListener
 				this.width = width;
 				this.height = height;
 				this.State = State;
+				this.position = position;
 			} 
 			public string path_initial;
 			public string path_dug_version;
@@ -70,6 +73,7 @@ public class TuioDemo : Form , TuioListener
 			public string path_seeded;
 			public string State;
 			public string seed;
+			public string position;
 			public int WateringNo;
 			public int x;
 			public int y;
@@ -105,14 +109,14 @@ public class TuioDemo : Form , TuioListener
         //AddUserMacAddress("38:65:B2:D9:A7:DA");
 
 
-        int y = 325;
-			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width+125,this.Height+60);
+			int y = 325;
+			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width+125,this.Height+60,"L");
 			Pots.Add(Pot1);		
-			Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657,  this.Width+5, this.Height+45);
+			Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657,  this.Width+5, this.Height+45, "LC");
 			Pots.Add(Pot2);		
-			Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width+5, this.Height+45);
+			Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width+5, this.Height+45, "R");
 			Pots.Add(Pot3);		
-			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60);
+			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60, "RC");
 			Pots.Add(Pot4);
 			verbose = false;
 			fullscreen = true;
@@ -197,6 +201,7 @@ public class TuioDemo : Form , TuioListener
  		}
 
 		public void addTuioBlob(TuioBlob b) {
+		
 			lock(blobList) {
 				blobList.Add(b.SessionID,b);
 			}
@@ -221,11 +226,15 @@ public class TuioDemo : Form , TuioListener
 
 		protected override void OnPaintBackground(PaintEventArgs pevent)
 		{
-			
-			// Getting the graphics object
-			Bitmap small_shovel = new Bitmap("SHOVEL.png");
-			small_shovel.MakeTransparent();
+
+		// Getting the graphics object
+			if(small_shovel == null)
+			{
+             small_shovel = new Bitmap("SHOVEL.png");
+			}
+        small_shovel.MakeTransparent();
 			Graphics g = pevent.Graphics;
+			g.Clear(Color.White);
 		if (scene == 0)
 		{
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
@@ -332,20 +341,8 @@ public class TuioDemo : Form , TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 1)
-						{
-						    Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
-						    foreach (var pot in Pots)
-						    {
-						        if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
-						        {
-						            pot.State = "seeded";
-									pot.seed = "pumkin";
-						            break;
-						        }
-						    }
-						}
-					    if (tobj.SymbolID == 2)
+					
+					    if (tobj.SymbolID == 1)
 					    {
 					        Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 					        foreach (var pot in Pots)
@@ -361,7 +358,7 @@ public class TuioDemo : Form , TuioListener
 					            }
 					        }
 					    }
-						if (tobj.SymbolID == 3)
+						if (tobj.SymbolID == 2)
 						{
 						    Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 						    foreach (var pot in Pots)
@@ -374,6 +371,71 @@ public class TuioDemo : Form , TuioListener
 						            break;
 						        }
 						    }
+						}
+						if (tobj.SymbolID == 3)
+						{
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							foreach (var pot in Pots)
+							{
+								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								{
+									pot.State = "seeded";
+									pot.seed = "B";
+									break;
+								}
+							}
+						}
+						if (tobj.SymbolID == 4)
+						{
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							foreach (var pot in Pots)
+							{
+								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								{
+									pot.State = "seeded";
+									pot.seed = "W";
+									break;
+								}
+							}
+						}
+						if (tobj.SymbolID == 5)
+						{
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							foreach (var pot in Pots)
+							{
+								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								{
+									pot.State = "seeded";
+									pot.seed = "C";
+									break;
+								}
+							}
+						}
+						if (tobj.SymbolID == 6)
+						{
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							foreach (var pot in Pots)
+							{
+								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+							 {
+							     pot.State = "seeded";
+								    pot.seed = "P";
+									break;
+								}
+							}
+						}
+						if (tobj.SymbolID == 7)
+						{
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							foreach (var pot in Pots)
+							{
+								if (seedRect.IntersectsWith(pot.Rect) && pot.State == "dug")
+								{
+									pot.State = "seeded";
+									pot.seed = "R";
+									break;
+								}
+							}
 						}
                     switch (tobj.SymbolID)
                     {
@@ -413,7 +475,7 @@ public class TuioDemo : Form , TuioListener
                         // Draw object image with rotation
                         if (File.Exists(objectImagePath))
                         {
-                            using (Bitmap objectImage = new Bitmap(objectImagePath))
+                            using (objectImage = new Bitmap(objectImagePath))
                             {
                                 // Save the current state of the graphics object
                                 GraphicsState state = g.Save();
@@ -486,10 +548,10 @@ public class TuioDemo : Form , TuioListener
     private void InitializeComponent()
     {
             this.SuspendLayout();
-            // 
-            // TuioDemo
-            // 
-            this.ClientSize = new System.Drawing.Size(441, 290);
+        // 
+        // TuioDemo
+        // 
+			this.ClientSize = new System.Drawing.Size(441, 290);
             this.Name = "TuioDemo";
             this.Load += new System.EventHandler(this.TuioDemo_Load);
             this.ResumeLayout(false);
