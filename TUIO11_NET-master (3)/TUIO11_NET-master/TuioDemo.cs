@@ -456,7 +456,7 @@ public class TuioDemo : Form , TuioListener
                     switch (tobj.SymbolID)
                     {
                         case 0:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "small_shovel.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "SHOVEL.png");
 							
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg1.jpg");
                             break;
@@ -471,12 +471,12 @@ public class TuioDemo : Form , TuioListener
 							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
 							break;
                         case 3:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "Bseed.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "BEETROOT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 4:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "Wseed.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WHEAT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
@@ -515,9 +515,7 @@ public class TuioDemo : Form , TuioListener
                             {
                                 // Save the current state of the graphics object
                                 GraphicsState state = g.Save();
-
 								objectImage.MakeTransparent();
-
                                 // Apply transformations for rotation
                                 g.TranslateTransform(ox, oy);
                                 g.RotateTransform((float)(tobj.Angle / Math.PI * 180.0f));
@@ -526,18 +524,23 @@ public class TuioDemo : Form , TuioListener
 								// Draw the rotated object
 								if (tobj.SymbolID == 1)
 								{
-									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-25, size));
 
 								}
                                 else if (tobj.SymbolID == 2)
                                 {
-                                    g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size + 100 , size + 100));
+                                    g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size , size));
 
                                 }
-                                else
+                                else if (tobj.SymbolID == 0)
 								{
-									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
+                                    g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size - 25, size));
+                                }
+                                else 
+								{
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-100, size-100));
 								}
+
                                 // Restore the graphics state
                                 g.Restore(state);
                             }
