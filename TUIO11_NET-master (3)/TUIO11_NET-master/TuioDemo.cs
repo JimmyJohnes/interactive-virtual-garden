@@ -383,6 +383,8 @@ public class TuioDemo : Form , TuioListener
 						        {
 						            pot.State = "initial";
 									pot.WateringNo = 0;
+									pot.seed = null;
+									pot.phase = 1;
 									Score += 100;
 						            break;
 						        }
@@ -522,9 +524,9 @@ public class TuioDemo : Form , TuioListener
                                 g.TranslateTransform(-ox, -oy);
 
 								// Draw the rotated object
-								if (tobj.SymbolID == 1)
+								if (tobj.SymbolID == 1)//WATER
 								{
-									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-25, size));
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-25-50, size-50));
 
 								}
                                 else if (tobj.SymbolID == 2)
@@ -532,11 +534,11 @@ public class TuioDemo : Form , TuioListener
                                     g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size , size));
 
                                 }
-                                else if (tobj.SymbolID == 0)
+                                else if (tobj.SymbolID == 0) //SHOVEL
 								{
                                     g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size - 25, size));
                                 }
-                                else 
+                                else //SEED N STUFF
 								{
 									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-100, size-100));
 								}
@@ -551,12 +553,12 @@ public class TuioDemo : Form , TuioListener
                             // Fall back to drawing a rectangle
                             g.FillRectangle(objBrush, new Rectangle(ox - size, oy - size, size, size));
                         }
+						}
+					catch 
+					{
 					}
-					catch {
 
-                    }
-
-                }
+				    }
 				}
 			}
 
