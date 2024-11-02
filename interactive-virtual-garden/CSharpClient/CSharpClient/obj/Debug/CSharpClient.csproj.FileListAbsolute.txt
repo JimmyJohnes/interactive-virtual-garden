@@ -26,3 +26,13 @@ F:\Subjects\4th Year\Hci\interactive-virtual-garden\CSharpClient\CSharpClient\ob
 F:\Subjects\4th Year\Hci\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.csproj.CoreCompileInputs.cache
 F:\Subjects\4th Year\Hci\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.exe
 F:\Subjects\4th Year\Hci\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.pdb
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\CSharpClient.exe.config
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\CSharpClient.exe
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\CSharpClient.pdb
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.csproj.AssemblyReference.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.Form1.resources
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.Properties.Resources.resources
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.csproj.GenerateResource.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.csproj.CoreCompileInputs.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.exe
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpClient.pdb

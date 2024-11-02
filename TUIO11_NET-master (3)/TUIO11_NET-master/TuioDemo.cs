@@ -276,27 +276,35 @@ public class TuioDemo : Form , TuioListener
                     }
                 case "seeded":
                     {
-                        g.DrawImage(Image.FromFile("P"+pot.seed+pot.position+pot.phase+".png"), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+                        // Determine the phase value to use
+                        string phase = (pot.phase == 4 && pot.seed == "R") ? "3" : pot.phase.ToString();
+
+                        // Draw the image with the selected phase
+                        g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + phase + ".png"), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+
                         break;
                     }
 				case "watered":
 					{
-                        g.DrawImage(Image.FromFile(pot.path_seeded), new Rectangle(pot.x, pot.y, pot.width, pot.height));
                         if (pot.WateringNo < 10 && pot.WateringNo >= 0)
                         {
-                            g.DrawImage(Image.FromFile("LVL1.png"), new Rectangle(pot.x + 70, pot.y -100, pot.width/2, pot.height/2));
+							pot.phase = 1;
+                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x , pot.y , pot.width, pot.height));
                         }
                         if (pot.WateringNo < 20 && pot.WateringNo >= 10)
                         {
-                            g.DrawImage(Image.FromFile("LVL2.png"), new Rectangle(pot.x +70, (pot.y+30) - pot.height /2 , (pot.width+20) /2 , (pot.height+20) / 2));
+                            pot.phase = 2;
+                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20 , pot.y - 20, pot.width, pot.height));
                         }
                         if (pot.WateringNo < 30 && pot.WateringNo >= 20)
                         {
-                            g.DrawImage(Image.FromFile("LVL3.png"), new Rectangle(pot.x-10, (pot.y - 150)- pot.height / 2, pot.width +50 , pot.height + 50));
+                            pot.phase = 3;
+                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20 , pot.y - 40 , pot.width , pot.height));
                         }
                         if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
                         {
-                            g.DrawImage(Image.FromFile("LVL4.png"), new Rectangle(pot.x-35, pot.y - 200 - pot.height/2, pot.width, pot.height + 100));
+                            pot.phase = 4;
+                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 60, pot.width, pot.height));
                         }
                         break;					
 					}
@@ -382,7 +390,7 @@ public class TuioDemo : Form , TuioListener
 						}
 						if (tobj.SymbolID == 3)
 						{
-							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size , size);
 							foreach (var pot in Pots)
 							{
 								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
@@ -395,7 +403,7 @@ public class TuioDemo : Form , TuioListener
 						}
 						if (tobj.SymbolID == 4)
 						{
-							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size , size );
 							foreach (var pot in Pots)
 							{
 								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
@@ -408,7 +416,7 @@ public class TuioDemo : Form , TuioListener
 						}
 						if (tobj.SymbolID == 5)
 						{
-							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
 							{
 								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
@@ -421,7 +429,7 @@ public class TuioDemo : Form , TuioListener
 						}
 						if (tobj.SymbolID == 6)
 						{
-							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
 							{
 								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
@@ -434,7 +442,7 @@ public class TuioDemo : Form , TuioListener
 						}
 						if (tobj.SymbolID == 7)
 						{
-							Rectangle seedRect = new Rectangle(ox - size, oy - size, size / 4, size / 4);
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
 							{
 								if (Intersect(seedRect, pot.Rect) && pot.State == "dug")
@@ -518,7 +526,7 @@ public class TuioDemo : Form , TuioListener
 								// Draw the rotated object
 								if (tobj.SymbolID == 1)
 								{
-									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size / 4, size / 4));
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
 
 								}
                                 else if (tobj.SymbolID == 2)
