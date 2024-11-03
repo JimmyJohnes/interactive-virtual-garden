@@ -33,26 +33,154 @@ using MongoDB.Bson;
 using System.Net.Mail;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
+using System.Text.Json;
+using MongoDB.Driver;
 
 public class TuioDemo : Form , TuioListener
 {
+    private readonly IMongoCollection<Device> _deviceCollection;
+
+
+    public class Device
+    {
+        public String name { get; set; }
+        public String address { get; set; }
+        public Device()
+        {
+            this.name = "";
+            this.address = "";
+        }
+        public Device(String name, String address)
+        {
+            this.name = name;
+            this.address = address;
+        }
+    }
+    public class DeviceJson
+    {
+        public List<Device> devices { get; set; }
+        public DeviceJson(List<Device> devices)
+        {
+            this.devices = devices;
+        }
+    }
+    public DeviceJson getBluetoothDevicesAndUploadToDatabase()
+    {
+
+        try
+        {
+
+            String ip = "127.0.0.1";
+            int port = 3000;
+            IPAddress ipAddr = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+
+            Socket sender = new Socket(ipAddr.AddressFamily,
+                      SocketType.Stream, ProtocolType.Tcp);
+
+            try
+            {
+
+                sender.Connect(localEndPoint);
+                Console.WriteLine($"Socket connected to {ip}:{port}");
+
+
+                byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+                int byteSent = sender.Send(messageSent);
+
+                byte[] messageReceived = new byte[1024];
+
+                int byteRecv = sender.Receive(messageReceived);
+
+                String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+                Console.WriteLine(Response);
+                DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
+                if (deviceJson?.devices != null)
+                {
+                    foreach (Device device in deviceJson.devices)
+                    {
+                        if (!mongoDbOps.DoesAddressExist("users",device.address))
+                        {
+                            var document = new BsonDocument
+							 {
+								{ "mac_address", device.address}
+							};
+                            mongoDbOps.InsertDocument("users",document);
+                            Console.WriteLine($"Device with address {device.address} inserted.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Device with address {device.address} already exists. Skipping insertion.");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No devices found in the JSON response.");
+                }
+                Console.WriteLine(deviceJson.devices.Count);
+				Console.WriteLine("recieved");
+                foreach (Device device in deviceJson.devices)
+                {
+                    Console.WriteLine($"name:{device.name}, address: {device.address}");
+                }
+				
+                sender.Shutdown(SocketShutdown.Both);
+                sender.Close();
+				return deviceJson;
+            }
+
+            catch (ArgumentNullException ane)
+            {
+
+                Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                return null;
+
+            }
+
+            catch (SocketException se)
+            {
+
+                Console.WriteLine("SocketException : {0}", se.ToString());
+                return null;
+
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Unexpected exception : {0}", e.ToString());
+				return null;
+            }
+        }
+
+        catch (Exception e)
+        {
+
+            Console.WriteLine(e.ToString());
+            return null;
+        }
+    }
     //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-    private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
+    private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
     public int scene=1;
     public Bitmap small_shovel;
 	public Bitmap objectImage;
-    public void AddUserMacAddress(string macAddress)
+    public void AddUserMacAddress(string macAddress, string name)
     {
         // Create a BsonDocument with the MAC address
         var document = new BsonDocument
         {
-            { "mac_address", "38:65:B2:D9:A7:DA"}
+            {"username",name},
+            { "mac_address", macAddress}
         };
 
         // Call the InsertDocument method to add the document to the "users" collection
         mongoDbOps.InsertDocument("users", document);
     }
-
+    
     public class Pot
 		{
 			public Pot(string path_initial,string path_dug, int x, int y, int width, int height,string position,int phase = 1,string State = "initial")
@@ -96,8 +224,10 @@ public class TuioDemo : Form , TuioListener
 		private int screen_height = Screen.PrimaryScreen.Bounds.Height;
 		public int Score;
 		private bool fullscreen;
-		private bool verbose;
-	private Label displayLabel;
+	    int time = 0;
+		
+	    private bool verbose;
+		private Label displayLabel;
 		Font font = new Font("Minecraft", 10.0f);
 		SolidBrush fntBrush = new SolidBrush(Color.White);
 		SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0,0,64));
@@ -115,8 +245,8 @@ public class TuioDemo : Form , TuioListener
 	public TuioDemo(int port) {
 
         //AddUserMacAddress("38:65:B2:D9:A7:DA");
-
-
+			
+			
 			int y = 325;
 			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width+125,this.Height+60,"L");
 			Pots.Add(Pot1);		
@@ -126,7 +256,7 @@ public class TuioDemo : Form , TuioListener
 			Pots.Add(Pot3);		
 			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60, "R");
 			Pots.Add(Pot4);
-			verbose = false;
+			verbose = true;
 			fullscreen = true;
 			width = window_width;
 			height = window_height;
@@ -229,14 +359,17 @@ public class TuioDemo : Form , TuioListener
 		}
 
 		public void refresh(TuioTime frameTime) {
-			Invalidate();
+        Invalidate();
 		}
 
 		protected override void OnPaintBackground(PaintEventArgs pevent)
 		{
-			
 		// Getting the graphics object
-			if(small_shovel == null)
+
+			getBluetoothDevicesAndUploadToDatabase();
+		
+			time++;
+        if (small_shovel == null)
 			{
              small_shovel = new Bitmap("SHOVEL.png");
 			}
@@ -607,7 +740,7 @@ public class TuioDemo : Form , TuioListener
 
     public static void Main(String[] argv) {
 	 		int port = 0;
-			switch (argv.Length) {
+            switch (argv.Length) {
 				case 1:
 					port = int.Parse(argv[0],null);
 					if(port==0) goto default;

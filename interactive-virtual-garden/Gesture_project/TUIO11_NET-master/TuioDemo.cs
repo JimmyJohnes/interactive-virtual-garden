@@ -114,8 +114,7 @@ public class TuioDemo : Form
 	}
 	public TuioDemo(int port) {
 
-        //AddUserMacAddress("38:65:B2:D9:A7:DA");
-
+			//AddUserMacAddress("38:65:B2:D9:A7:DA");
 
 			int y = 325;
 			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width+125,this.Height+60,"L");
@@ -126,7 +125,6 @@ public class TuioDemo : Form
 			Pots.Add(Pot3);		
 			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60, "R");
 			Pots.Add(Pot4);
-			 
 			verbose = false;
 			fullscreen = true;
 			width = window_width;
@@ -150,19 +148,14 @@ public class TuioDemo : Form
 			this.SetStyle( ControlStyles.AllPaintingInWmPaint |
 							ControlStyles.UserPaint |
 							ControlStyles.DoubleBuffer, true);
-
-			
-
 		}
 
 		
 
 		private void Form_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
-
 			System.Environment.Exit(0);
 		}
-
 
 
 		public void refresh(TuioTime frameTime) {
@@ -171,7 +164,6 @@ public class TuioDemo : Form
 
 	protected override void OnPaintBackground(PaintEventArgs pevent)
 	{
-
 		// Getting the graphics object
 		if (small_shovel == null)
 		{
@@ -194,10 +186,6 @@ public class TuioDemo : Form
 		int y = 325;
 		displayLabel.Text = Score.ToString();
 
-
-
-
-		
 			switch (Pots[currentPot].State)
 			{
 				case "initial":
@@ -247,9 +235,6 @@ public class TuioDemo : Form
 
 			}
 		
-
-
-
 		string objectImagePath;
 		string backgroundImagePath;
 		string gesture = "";
