@@ -38,6 +38,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using MongoDB.Driver;
+using static System.Windows.Forms.AxHost;
 
 public class TuioDemo : Form , TuioListener
 {
@@ -165,7 +166,7 @@ public class TuioDemo : Form , TuioListener
     }
     //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-    public int scene=1;
+    public int scene=2;
     public Bitmap small_shovel;
 	public Bitmap objectImage;
     public void AddUserMacAddress(string macAddress, string name)
@@ -180,36 +181,55 @@ public class TuioDemo : Form , TuioListener
         // Call the InsertDocument method to add the document to the "users" collection
         mongoDbOps.InsertDocument("users", document);
     }
-    
-    public class Pot
+    public class Villager
+	{
+        public Rectangle Rect;
+        public string position;
+        public int x;
+        public int y;
+        public int width;
+        public int height;
+        public Villager(int x, int y, int width, int height, string position)
 		{
-			public Pot(string path_initial,string path_dug, int x, int y, int width, int height,string position,int phase = 1,string State = "initial")
-			{
-				this.path_initial = path_initial;
-				this.path_dug_version = path_dug;
-				this.Rect = new Rectangle (x,y,width,height);
-				this.x = x;
-				this.y = y;
-				this.width = width;
-				this.height = height;
-				this.State = State;
-				this.position = position;
-				this.phase = phase;
-			} 
-			public string path_initial;
-			public string path_dug_version;
-			public Rectangle Rect;
-			public string path_seeded;
-			public string State;
-			public string seed;
-			public string position;
-			public int WateringNo;
-			public int phase;
-			public int x;
-			public int y;
-		    public int width;
-			public int height;
+            this.Rect = new Rectangle(x, y, width, height);
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.position = position;//left or go right
+        }
+	}
+
+    public class Pot
+	{
+		public Pot(string path_initial,string path_dug, int x, int y, int width, int height,string position,int phase = 1,string State = "initial")
+		{
+			this.path_initial = path_initial;
+			this.path_dug_version = path_dug;
+			this.Rect = new Rectangle (x,y,width,height);
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.State = State;
+			this.position = position;
+			this.phase = phase;
 		}
+   
+	    public string path_initial;
+		public string path_dug_version;
+		public Rectangle Rect;
+		public string path_seeded;
+		public string State;
+		public string seed;
+		public string position;
+		public int WateringNo;
+		public int phase;
+		public int x;
+		public int y;
+		public int width;
+		public int height;
+	}
     private TuioClient client;
 		private Dictionary<long,TuioObject> objectList;
 		private Dictionary<long,TuioCursor> cursorList;
@@ -225,7 +245,15 @@ public class TuioDemo : Form , TuioListener
 		public int Score;
 		private bool fullscreen;
 	    int time = 0;
+	/// <summary>
+	/// /////////////////
+	/// </summary>
+	/// 
 		
+		public Villager V = new Villager(1400, 450, 603/2 -100, 700/2 -50, "C");
+	/// <summary>
+	/// //////////
+	/// </summary>
 	    private bool verbose;
 		private Label displayLabel;
 		Font font = new Font("Minecraft", 10.0f);
@@ -248,15 +276,21 @@ public class TuioDemo : Form , TuioListener
 			
 			
 			int y = 325;
-			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width+125,this.Height+60,"L");
-			Pots.Add(Pot1);		
-			Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657,  this.Width+5, this.Height+45, "LC");
-			Pots.Add(Pot2);		
-			Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width+5, this.Height+45, "RC");
-			Pots.Add(Pot3);		
-			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width+125, this.Height+60, "R");
+		
+			Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L");
+			Pots.Add(Pot1);
+			Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC");
+			Pots.Add(Pot2);
+			Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC");
+			Pots.Add(Pot3);
+			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R");
 			Pots.Add(Pot4);
-			verbose = true;
+			
+			
+
+
+
+            verbose = true;
 			fullscreen = true;
 			width = window_width;
 			height = window_height;
@@ -380,74 +414,91 @@ public class TuioDemo : Form , TuioListener
 		{
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
 		}
-		else
+		else if (scene ==1)
 		{
             g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
         }
-			int imgwidth = 90;
+		else if ( scene==2)
+		{
+            g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+
+        }
+        int imgwidth = 90;
 			int imgheight = 90;
-			int y = 325;
+			int y = 325; 
 			displayLabel.Text = Score.ToString();
 			
 
 			
+		if(scene == 1)
+		{
+			foreach (var pot in Pots)
+			{
 
-        foreach (var pot in Pots)
-        {
-            switch (pot.State)
-            {
-                case "initial":
-                    {
-                        g.DrawImage(Image.FromFile(pot.path_initial), new Rectangle(pot.x, pot.y, pot.width, pot.height));
-                        break;
-                    }
-                case "dug":
-                    {
-                        g.DrawImage(Image.FromFile(pot.path_dug_version), new Rectangle(pot.x, pot.y, pot.width, pot.height));
-                        break;
-                    }
-                case "seeded":
-                    {
-                        // Determine the phase value to use
-                        string phase = (pot.phase == 4 && pot.seed == "R") ? "3" : pot.phase.ToString();
+				switch (pot.State)
+				{
+					case "initial":
+						{
+							g.DrawImage(Image.FromFile(pot.path_initial), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+							break;
+						}
+					case "dug":
+						{
+							g.DrawImage(Image.FromFile(pot.path_dug_version), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+							break;
+						}
+					case "seeded":
+						{
+							// Determine the phase value to use
+							string phase = (pot.phase == 4 && pot.seed == "R") ? "3" : pot.phase.ToString();
 
-                        // Draw the image with the selected phase
-                        g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + phase + ".png"), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+							// Draw the image with the selected phase
+							g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + phase + ".png"), new Rectangle(pot.x, pot.y, pot.width, pot.height));
 
-                        break;
-                    }
-				case "watered":
-					{
-                        if (pot.WateringNo < 10 && pot.WateringNo >= 0)
-                        {
-							pot.phase = 1;
-                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x , pot.y , pot.width, pot.height));
-                        }
-                        if (pot.WateringNo < 20 && pot.WateringNo >= 10)
-                        {
-                            pot.phase = 2;
-                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20 , pot.y - 20, pot.width, pot.height));
-                        }
-                        if (pot.WateringNo < 30 && pot.WateringNo >= 20)
-                        {
-                            pot.phase = 3;
-                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20 , pot.y - 40 , pot.width , pot.height));
-                        }
-                        if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
-                        {
-                            pot.phase = 4;
-                            g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 60, pot.width, pot.height));
-                        }
-                        break;					
-					}
+							break;
+						}
+					case "watered":
+						{
+							if (pot.WateringNo < 10 && pot.WateringNo >= 0)
+							{
+								pot.phase = 1;
+								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+							}
+							if (pot.WateringNo < 20 && pot.WateringNo >= 10)
+							{
+								pot.phase = 2;
+								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 20, pot.width, pot.height));
+							}
+							if (pot.WateringNo < 30 && pot.WateringNo >= 20)
+							{
+								pot.phase = 3;
+								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 40, pot.width, pot.height));
+							}
+							if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
+							{
+								pot.phase = 4;
+								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 60, pot.width, pot.height));
+							}
+							break;
+						}
+				}
+			}
+        }
+		else if (scene == 2)
+		{
+		    g.DrawImage(Image.FromFile("Wseed.png"),  new Rectangle(new Point( 400  -40, 500),  new Size(111,111)));
+		    g.DrawImage(Image.FromFile("Bseed.png"),  new Rectangle(new Point( 600  -40, 500),  new Size(111,111)));
+		    g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point( 800  -40, 500),  new Size(111,111)));
+		    g.DrawImage(Image.FromFile("potato.png"), new Rectangle(new Point( 1000 -40, 500),  new Size(111,111)));
+		    g.DrawImage(Image.FromFile("berry.png"),  new Rectangle(new Point( 1200 -40, 500),  new Size(111,111)));
 
-				} 
+            g.DrawImage(Image.FromFile("Stare.png"), new Rectangle(new Point(V.x, V.y), new Size(V.width,V.height)));//VILLAGER
+			g.DrawImage(Image.FromFile("TABLE.png"), new Rectangle(new Point(0, 1080-530), new Size(this.Width,530)));
         }
 
 
-
-			string objectImagePath;
+        string objectImagePath;
 			string backgroundImagePath;
             // draw the cursor path
             if (cursorList.Count > 0)
@@ -617,7 +668,7 @@ public class TuioDemo : Form , TuioListener
                             break;
                         case 5:
                             objectImagePath = Path.Combine(Environment.CurrentDirectory, "carrot.png");
-
+							
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 6:
