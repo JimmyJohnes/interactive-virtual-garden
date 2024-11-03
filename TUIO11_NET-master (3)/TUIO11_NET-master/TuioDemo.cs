@@ -383,6 +383,8 @@ public class TuioDemo : Form , TuioListener
 						        {
 						            pot.State = "initial";
 									pot.WateringNo = 0;
+									pot.seed = null;
+									pot.phase = 1;
 									Score += 100;
 						            break;
 						        }
@@ -456,7 +458,7 @@ public class TuioDemo : Form , TuioListener
                     switch (tobj.SymbolID)
                     {
                         case 0:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "small_shovel.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "SHOVEL.png");
 							
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg1.jpg");
                             break;
@@ -471,12 +473,12 @@ public class TuioDemo : Form , TuioListener
 							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
 							break;
                         case 3:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "Bseed.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "BEETROOT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 4:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "Wseed.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WHEAT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
@@ -515,29 +517,32 @@ public class TuioDemo : Form , TuioListener
                             {
                                 // Save the current state of the graphics object
                                 GraphicsState state = g.Save();
-
 								objectImage.MakeTransparent();
-
                                 // Apply transformations for rotation
                                 g.TranslateTransform(ox, oy);
                                 g.RotateTransform((float)(tobj.Angle / Math.PI * 180.0f));
                                 g.TranslateTransform(-ox, -oy);
 
 								// Draw the rotated object
-								if (tobj.SymbolID == 1)
+								if (tobj.SymbolID == 1)//WATER
 								{
-									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-25-50, size-50));
 
 								}
                                 else if (tobj.SymbolID == 2)
                                 {
-                                    g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size + 100 , size + 100));
+                                    g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size , size));
 
                                 }
-                                else
+                                else if (tobj.SymbolID == 0) //SHOVEL
 								{
-									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size, size));
+                                    g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size - 25, size));
+                                }
+                                else //SEED N STUFF
+								{
+									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-100, size-100));
 								}
+
                                 // Restore the graphics state
                                 g.Restore(state);
                             }
@@ -548,12 +553,12 @@ public class TuioDemo : Form , TuioListener
                             // Fall back to drawing a rectangle
                             g.FillRectangle(objBrush, new Rectangle(ox - size, oy - size, size, size));
                         }
+						}
+					catch 
+					{
 					}
-					catch {
 
-                    }
-
-                }
+				    }
 				}
 			}
 
