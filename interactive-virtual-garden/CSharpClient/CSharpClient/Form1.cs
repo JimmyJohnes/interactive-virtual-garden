@@ -1,16 +1,54 @@
 ﻿using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Collections;
+using System.Threading;
+using TUIO;
+using System.IO;
+using System.Drawing.Drawing2D;
+using MongoDBOperations;
+using static TuioDemo;
+using MongoDB.Bson;
+using System.Net.Mail;
+using System.Data.SqlClient;
+using System.Data.SqlTypes;
 
 namespace CSharpClient
-{
+{   
+    
     public partial class Form1 : Form
     {
+        public class Pot
+	{
+		public Pot(string path_initial,string path_dug, int x, int y, int width, int height,string position,int phase = 1,string State = "initial")
+		{
+			this.path_initial = path_initial;
+			this.path_dug_version = path_dug;
+			this.Rect = new Rectangle (x,y,width,height);
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.State = State;
+			this.position = position;
+			this.phase = phase;
+		} 
+		public string path_initial;
+		public string path_dug_version;
+		public Rectangle Rect;
+		public string path_seeded;
+		public string State;
+		public string seed;
+		public string position;
+		public int WateringNo;
+		public int phase;
+		public int x;
+		public int y;
+	    public int width;
+		public int height;
+	}
         Stopwatch stopwatch = new Stopwatch();
         readonly Timer tt = new Timer();
         TcpClient client;
