@@ -68,6 +68,81 @@ public class TuioDemo : Form , TuioListener
             this.devices = devices;
         }
     }
+	public bool getBluetoothDevicesAndLogin()
+	{
+		try
+		{
+
+			String ip = "127.0.0.1";
+			int port = 3000;
+			IPAddress ipAddr = IPAddress.Parse(ip);
+			IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+
+			Socket sender = new Socket(ipAddr.AddressFamily,
+					  SocketType.Stream, ProtocolType.Tcp);
+
+			try
+			{
+
+				sender.Connect(localEndPoint);
+				Console.WriteLine($"Socket connected to {ip}:{port}");
+
+
+				byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+				int byteSent = sender.Send(messageSent);
+
+				byte[] messageReceived = new byte[1024];
+
+				int byteRecv = sender.Receive(messageReceived);
+
+				String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+				Console.WriteLine(Response);
+				DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
+				if (deviceJson?.devices != null)
+				{
+					foreach (Device device in deviceJson.devices)
+					{
+						if (mongoDbOps.DoesAddressExist("users", device.address))
+						{
+							Console.WriteLine($"Device with address {device.address} Logged in.");
+							return true;
+						}
+						else
+						{
+                            var document = new BsonDocument
+                             {
+                                { "mac_address", device.address}
+                            };
+                            mongoDbOps.InsertDocument("users", document);
+                            Console.WriteLine($"Device with address {device.address} inserted.");
+                            Console.WriteLine($"Device with address {device.address} is not registered.");
+						}
+					}
+				}
+				else
+				{
+					Console.WriteLine("No devices found in the JSON response.");
+				}
+				Console.WriteLine(deviceJson.devices.Count);
+				Console.WriteLine("recieved");
+				foreach (Device device in deviceJson.devices)
+				{
+					Console.WriteLine($"name:{device.name}, address: {device.address}");
+				}
+
+				sender.Shutdown(SocketShutdown.Both);
+				sender.Close();
+				return false;
+			}
+			catch
+			{
+
+			}
+
+		}
+		catch { }
+		return false;
+	}
     public DeviceJson getBluetoothDevicesAndUploadToDatabase()
     {
 
@@ -166,7 +241,7 @@ public class TuioDemo : Form , TuioListener
     }
     //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-    public int scene=2;
+    public int scene=0;
     public Bitmap small_shovel;
 	public Bitmap objectImage;
     public void AddUserMacAddress(string macAddress, string name)
@@ -255,6 +330,7 @@ public class TuioDemo : Form , TuioListener
 	/// //////////
 	/// </summary>
 	    private bool verbose;
+		
 		private Label displayLabel;
 		Font font = new Font("Minecraft", 10.0f);
 		SolidBrush fntBrush = new SolidBrush(Color.White);
@@ -400,7 +476,6 @@ public class TuioDemo : Form , TuioListener
 		{
 		// Getting the graphics object
 
-			getBluetoothDevicesAndUploadToDatabase();
 		
 			time++;
         if (small_shovel == null)
@@ -412,7 +487,14 @@ public class TuioDemo : Form , TuioListener
 			g.Clear(Color.White);
 		if (scene == 0)
 		{
+
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
+			if (getBluetoothDevicesAndLogin())
+			{
+				scene = 1;
+			}
+
+
 		}
 		else if (scene ==1)
 		{
@@ -428,10 +510,10 @@ public class TuioDemo : Form , TuioListener
 			int imgheight = 90;
 			int y = 325; 
 			displayLabel.Text = Score.ToString();
-			
 
-			
-		if(scene == 1)
+
+
+		if (scene == 1)
 		{
 			foreach (var pot in Pots)
 			{
@@ -484,19 +566,37 @@ public class TuioDemo : Form , TuioListener
 						}
 				}
 			}
-        }
+		}
 		else if (scene == 2)
 		{
-		    g.DrawImage(Image.FromFile("Wseed.png"),  new Rectangle(new Point( 400  -40, 500),  new Size(111,111)));
-		    g.DrawImage(Image.FromFile("Bseed.png"),  new Rectangle(new Point( 600  -40, 500),  new Size(111,111)));
-		    g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point( 800  -40, 500),  new Size(111,111)));
-		    g.DrawImage(Image.FromFile("potato.png"), new Rectangle(new Point( 1000 -40, 500),  new Size(111,111)));
-		    g.DrawImage(Image.FromFile("berry.png"),  new Rectangle(new Point( 1200 -40, 500),  new Size(111,111)));
+			g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
+			g.DrawImage(Image.FromFile("Bseed.png"), new Rectangle(new Point(600 - 40, 500), new Size(111, 111)));
+			g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point(800 - 40, 500), new Size(111, 111)));
+			g.DrawImage(Image.FromFile("potato.png"), new Rectangle(new Point(1000 - 40, 500), new Size(111, 111)));
+			g.DrawImage(Image.FromFile("berry.png"), new Rectangle(new Point(1200 - 40, 500), new Size(111, 111)));
 
-            g.DrawImage(Image.FromFile("Stare.png"), new Rectangle(new Point(V.x, V.y), new Size(V.width,V.height)));//VILLAGER
-			g.DrawImage(Image.FromFile("TABLE.png"), new Rectangle(new Point(0, 1080-530), new Size(this.Width,530)));
-        }
 
+			g.DrawImage(Image.FromFile("Stare.png"), new Rectangle(new Point(V.x, V.y), new Size(V.width, V.height)));//VILLAGER
+			g.DrawImage(Image.FromFile("TABLE.png"), new Rectangle(new Point(0, 1080 - 530), new Size(this.Width, 530)));
+
+			if (objectList.Count > 0)
+			{
+				lock (objectList)
+				{
+					foreach (TuioObject tobj in objectList.Values)
+					{
+						int ox = tobj.getScreenX(width);
+						int oy = tobj.getScreenY(height);
+						int size = height / 6;
+						if (tobj.SymbolID == 0)
+						{
+						}
+					
+					}
+
+				}
+			}
+		}
 
         string objectImagePath;
 			string backgroundImagePath;
