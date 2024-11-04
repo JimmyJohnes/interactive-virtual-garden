@@ -257,7 +257,7 @@ public class TuioDemo : Form , TuioListener
 	    private bool verbose;
 		private Label displayLabel;
 		Font font = new Font("Minecraft", 10.0f);
-		SolidBrush fntBrush = new SolidBrush(Color.White);
+		SolidBrush fntBrush = new SolidBrush(Color.Transparent);
 		SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0,0,64));
 		SolidBrush curBrush = new SolidBrush(Color.FromArgb(192, 0, 192));
 		SolidBrush objBrush = new SolidBrush(Color.FromArgb(64, 0, 0));
@@ -286,21 +286,21 @@ public class TuioDemo : Form , TuioListener
 			Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R");
 			Pots.Add(Pot4);
 			
-			
-
-
-
             verbose = true;
 			fullscreen = true;
 			width = window_width;
 			height = window_height;
+		if (scene == 2) 
+		{
 			displayLabel = new Label();
 			displayLabel.Text = Score.ToString();
-			displayLabel.Location = new System.Drawing.Point(965, 50);
+			displayLabel.Location = new System.Drawing.Point(1920 / 2, 895);
 			displayLabel.AutoSize = true;
+			displayLabel.BackColor = Color.Transparent;
 			displayLabel.MinimumSize = new System.Drawing.Size(100, 50);
-			displayLabel.Font = new Font("Minecraft", 30);
+			displayLabel.Font = new Font("Minecraft", 65);
 			displayLabel.TextAlign = ContentAlignment.MiddleCenter;
+		}
 			this.Controls.Add(displayLabel);
 			this.ClientSize = new System.Drawing.Size(width, height);
 			this.Name = "TuioDemo";
@@ -424,7 +424,7 @@ public class TuioDemo : Form , TuioListener
             g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
         }
-        int imgwidth = 90;
+		    int imgwidth = 90;
 			int imgheight = 90;
 			int y = 325; 
 			displayLabel.Text = Score.ToString();
@@ -485,6 +485,7 @@ public class TuioDemo : Form , TuioListener
 				}
 			}
         }
+
 		else if (scene == 2)
 		{
 		    g.DrawImage(Image.FromFile("Wseed.png"),  new Rectangle(new Point( 400  -40, 500),  new Size(111,111)));
@@ -494,6 +495,7 @@ public class TuioDemo : Form , TuioListener
 		    g.DrawImage(Image.FromFile("berry.png"),  new Rectangle(new Point( 1200 -40, 500),  new Size(111,111)));
 
             g.DrawImage(Image.FromFile("Stare.png"), new Rectangle(new Point(V.x, V.y), new Size(V.width,V.height)));//VILLAGER
+
 			g.DrawImage(Image.FromFile("TABLE.png"), new Rectangle(new Point(0, 1080-530), new Size(this.Width,530)));
         }
 
@@ -639,6 +641,8 @@ public class TuioDemo : Form , TuioListener
 								}
 							}
 						}
+					
+					
                     switch (tobj.SymbolID)
                     {
                         case 0:
@@ -680,6 +684,11 @@ public class TuioDemo : Form , TuioListener
                             objectImagePath = Path.Combine(Environment.CurrentDirectory, "berry.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+                            break;  
+						case 8:
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "EMERALD.png");
+
+                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
 
                         default:
@@ -713,7 +722,7 @@ public class TuioDemo : Form , TuioListener
 									g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size-25-50, size-50));
 
 								}
-                                else if (tobj.SymbolID == 2)
+                                else if (tobj.SymbolID == 2)//HOE
                                 {
                                     g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size , size));
 
@@ -721,6 +730,10 @@ public class TuioDemo : Form , TuioListener
                                 else if (tobj.SymbolID == 0) //SHOVEL
 								{
                                     g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size - 25, size));
+                                }
+								else if (tobj.SymbolID == 8) //EMERALD
+								{
+                                    g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size - 100, size-70));
                                 }
                                 else //SEED N STUFF
 								{
