@@ -40,6 +40,7 @@ using System.Text.Json;
 using MongoDB.Driver;
 using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
+using System.Security.Cryptography.X509Certificates;
 
 public class TuioDemo : Form, TuioListener
 {
@@ -321,7 +322,7 @@ public class TuioDemo : Form, TuioListener
 
 	public class Pot
 	{
-		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position, int phase = 1, string State = "initial")
+		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position,int min_Y, int phase = 1, string State = "initial" )
 		{
 			this.path_initial = path_initial;
 			this.path_dug_version = path_dug;
@@ -333,8 +334,9 @@ public class TuioDemo : Form, TuioListener
 			this.State = State;
 			this.position = position;
 			this.phase = phase;
+			this.min_Y = min_Y;
 		}
-
+		public int min_Y;
 		public string path_initial;
 		public string path_dug_version;
 		public Rectangle Rect;
@@ -419,15 +421,15 @@ public class TuioDemo : Form, TuioListener
 
 		int y = 325;
 
-		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L");
+		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L",652);
 		Pots.Add(Pot1);
-		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC");
+		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC",657);
 		Pots.Add(Pot2);
-		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC");
+		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC",657);
 		Pots.Add(Pot3);
-		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R");
+		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R",652);
 		Pots.Add(Pot4);
-
+		
 		//  g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
 		//  g.DrawImage(Image.FromFile("Bseed.png"), new Rectangle(new Point(600 - 40, 500), new Size(111, 111)));
 		//  g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point(800 - 40, 500), new Size(111, 111)));
@@ -633,12 +635,13 @@ public class TuioDemo : Form, TuioListener
             {
                 g.DrawImage(Image.FromFile(RETURN.selected_img), new Rectangle(new Point(RETURN.x, RETURN.y), new Size(RETURN.width, RETURN.height)));
             }
-
+			int i= 0; 
             foreach (var pot in Pots)
 			{
 
 				switch (pot.State)
 				{
+	
 					case "initial":
 						{
 							g.DrawImage(Image.FromFile(pot.path_initial), new Rectangle(pot.x, pot.y, pot.width, pot.height));
@@ -661,6 +664,7 @@ public class TuioDemo : Form, TuioListener
 						}
 					case "watered":
 						{
+						
 							if (pot.WateringNo < 10 && pot.WateringNo >= 0)
 							{
 								pot.phase = 1;
