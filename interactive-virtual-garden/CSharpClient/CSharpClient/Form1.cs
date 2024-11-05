@@ -13,11 +13,37 @@ using static CSharpClient.Form1;
 using System.Runtime.CompilerServices;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using MongoDBOperations;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace CSharpClient
 {
     public partial class Form1 : Form
     {
+        public class Device
+        {
+            public String name { get; set; }
+            public String address { get; set; }
+            public Device()
+            {
+                this.name = "";
+                this.address = "";
+            }
+            public Device(String name, String address)
+            {
+                this.name = name;
+                this.address = address;
+            }
+        }
+        public class DeviceJson
+        {
+            public List<Device> devices { get; set; }
+            public DeviceJson(List<Device> devices)
+            {
+                this.devices = devices;
+            }
+        }
 
         public class Store_Items
         {
@@ -215,6 +241,13 @@ namespace CSharpClient
             switch (mode)
             {
                 case "Welcome":
+                    switch (command)
+                    {
+                        case "left":
+                            Select(-1, 4, ref Currentitem);
+                            break;
+                        
+                    }
                     break;
                 case "Shop":
                     switch (command)
@@ -228,8 +261,8 @@ namespace CSharpClient
                         case "harvest":
                             StoreItems[Currentitem].locked = false;
                             break;
-                        case "hoe":
-                            mode = "Shop";
+                        case "shop":
+                            mode = "Farm";
                             break;
                         default:
                             break;
@@ -258,13 +291,7 @@ namespace CSharpClient
                             {
                                 PotList[CurrentPot].State = "seeded";
                             }
-                            else
-                            {
-                                error_msg = "Cannot plant seed";
-                            }
-                            break;
-                        case "shop":
-                            if (PotList[CurrentPot].State == "seeded" || PotList[CurrentPot].State == "watered")
+                            else if (PotList[CurrentPot].State == "seeded" || PotList[CurrentPot].State == "watered")
                             {
                                 PotList[CurrentPot].State = "watered";
                                 if (PotList[CurrentPot].WateringNo < 4)
@@ -272,10 +299,14 @@ namespace CSharpClient
                                     PotList[CurrentPot].WateringNo++;
                                 }
                             }
-                            else {
+                            else
+                            {
                                 error_msg = "no seed is planted";
                             }
-
+                    
+                            break;
+                        case "shop":
+                            mode = "shop";
                             break;
                         default:
                             break;
@@ -464,7 +495,7 @@ namespace CSharpClient
             string Hovered;
             foreach (var storeItem in StoreItems)
             {
-                if (i == CurrentPot)
+                if (i == Currentitem)
                 {
                     Hovered = "H";
                 }
