@@ -156,7 +156,6 @@ public class TuioDemo : Form , TuioListener
 				return null;
             }
         }
-
         catch (Exception e)
         {
 
