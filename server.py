@@ -3,7 +3,7 @@ import asyncio
 import json
 from bleak_bluetooth import scan_bluetooth_devices
 import time
-
+import bluetooth_scan
 def convert_to_json(devices):
     device_json = {
         "devices": [
@@ -17,18 +17,17 @@ async def handle_client(c, addr):
         print(f'Handling connection from {addr}')
         
         # Perform Bluetooth scanning
-        devices = await scan_bluetooth_devices()
-        
         # Convert the scanned devices to JSON and add EOF marker
-        device_json = convert_to_json(devices)
-        response = json.dumps(device_json)
+        device_json = bluetooth_scan.get_connected_bluetooth_devices()
+        #response = json.dumps(device_json)
+        print(device_json)
         
         # Send the response to the client
-        c.sendall(response.encode())
+        c.sendall(device_json.encode())
         print(f"Sent Bluetooth devices to {addr}")
         
         # Introduce a slight delay for testing purposes
-        time.sleep(0.1)  # Adjust if necessary
+        time.sleep(1)  # Adjust if necessary
     except Exception as e:
         print(f"Error handling client {addr}: {e}")
     finally:
