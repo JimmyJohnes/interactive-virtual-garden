@@ -290,8 +290,6 @@ public class TuioDemo : Form , TuioListener
 			fullscreen = true;
 			width = window_width;
 			height = window_height;
-		if (scene == 2) 
-		{
 			displayLabel = new Label();
 			displayLabel.Text = Score.ToString();
 			displayLabel.Location = new System.Drawing.Point(1920 / 2, 895);
@@ -731,7 +729,6 @@ public class TuioDemo : Form , TuioListener
 								{
                                     g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size - 25, size));
                                 }
-								else if (tobj.SymbolID == 8) //EMERALD
 								{
                                     g.DrawImage(objectImage, new Rectangle(ox - size, oy - size, size - 100, size-70));
                                 }
