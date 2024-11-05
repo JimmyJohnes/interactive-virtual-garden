@@ -2,7 +2,7 @@ import subprocess
 import json
 
 def get_connected_bluetooth_devices():
-    # PowerShell command to get connected Bluetooth devices and output as JSON
+    # PowerShell command to get only currently connected Bluetooth devices
     ps_command = (
         "Get-PnpDevice -Class Bluetooth | "
         "Where-Object {$_.Status -eq 'OK'} | "
@@ -18,24 +18,22 @@ def get_connected_bluetooth_devices():
             text=True,
             check=True
         )
-
         
-        # Parse the JSON output
+        # Parse the JSON output from PowerShell
         devices = json.loads(result.stdout)
         
         # Handle single device (dict) vs multiple devices (list)
         if isinstance(devices, dict):
             devices = [devices]
         
+        # Build a list of device dictionaries
+        device_list = []
         if devices:
-            print("Connected Bluetooth devices:")
             for device in devices:
                 name = device.get("Name", "Unknown")
                 instance_id = device.get("InstanceId", "")
                 
                 # Attempt to extract MAC address from InstanceId
-                # The format may vary; adjust the parsing as needed
-                # Example InstanceId: "BTHENUM\\DEV_XXYYZZXXYYZZ_XXXXXXXXXXXX"
                 try:
                     mac_part = instance_id.split("_")[1]
                     mac_addr = mac_part[:12]
@@ -43,13 +41,20 @@ def get_connected_bluetooth_devices():
                 except (IndexError, ValueError):
                     formatted_mac = "N/A"
                 
-                print(f"Device Name: {name}, MAC Address: {formatted_mac}")
+                # Append device details as a dictionary
+                device_list.append({
+                    "name": name,
+                    "mac_address": formatted_mac
+                })
         else:
-            print("No connected Bluetooth devices found.")
+            return json.dumps({"devices": []})  # No devices found
+
+        # Return the device list as a JSON string
+        return json.dumps({"devices": device_list})
     
     except subprocess.CalledProcessError as e:
-        print("An error occurred while executing PowerShell command:")
-        print(e.stderr)
+        return json.dumps({"error": f"An error occurred while executing PowerShell command: {e.stderr}"})
 
 if __name__ == "__main__":
-    get_connected_bluetooth_devices()
+    devices_json = get_connected_bluetooth_devices()
+    print(devices_json)
