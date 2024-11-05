@@ -241,7 +241,7 @@ public class TuioDemo : Form , TuioListener
     }
     //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-    public int scene=0;
+    public int scene=2;
     public Bitmap small_shovel;
 	public Bitmap objectImage;
     public void AddUserMacAddress(string macAddress, string name)
@@ -506,7 +506,7 @@ public class TuioDemo : Form , TuioListener
             g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
         }
-        int imgwidth = 90;
+			int imgwidth = 90;
 			int imgheight = 90;
 			int y = 325; 
 			displayLabel.Text = Score.ToString();
