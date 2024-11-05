@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -10,7 +8,7 @@ namespace MongoDBOperations
 {
     public class MongoDBHandler
     {
-        private IMongoDatabase database;
+        private readonly IMongoDatabase database;
 
         public MongoDBHandler(string connectionString, string databaseName)
         {
@@ -20,7 +18,7 @@ namespace MongoDBOperations
 
         public void InsertDocument(string collectionName, BsonDocument document)
         {
-            var collection = database.GetCollection<BsonDocument>("users");
+            var collection = database.GetCollection<BsonDocument>(collectionName);
             collection.InsertOne(document);
             Console.WriteLine("Document inserted.");
         }
@@ -46,6 +44,15 @@ namespace MongoDBOperations
             var filter = Builders<BsonDocument>.Filter.Eq("Name", name);
             collection.DeleteOne(filter);
             Console.WriteLine("Document deleted.");
+        }
+
+        public bool DoesAddressExist(string collectionName, string address)
+        {
+            var collection = database.GetCollection<BsonDocument>(collectionName);
+            var filter = Builders<BsonDocument>.Filter.Eq("mac_address", address);
+            var count = collection.Find(filter).Limit(1).CountDocuments();
+            Console.WriteLine("count in db:"+count);
+            return count > 0;
         }
     }
 }

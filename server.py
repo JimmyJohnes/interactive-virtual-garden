@@ -2,45 +2,62 @@ import socket
 import asyncio
 import json
 from bleak_bluetooth import scan_bluetooth_devices
-
+import time
 
 def convert_to_json(devices):
     device_json = {
         "devices": [
-
+            {"name": device.name, "address": device.address} for device in devices
         ]
     }
-    for device in devices:
-        device_json["devices"].append({"name": device.name, "address":device.address})
     return device_json
+
+async def handle_client(c, addr):
+    try:
+        print(f'Handling connection from {addr}')
+        
+        # Perform Bluetooth scanning
+        devices = await scan_bluetooth_devices()
+        
+        # Convert the scanned devices to JSON and add EOF marker
+        device_json = convert_to_json(devices)
+        response = json.dumps(device_json)
+        
+        # Send the response to the client
+        c.sendall(response.encode())
+        print(f"Sent Bluetooth devices to {addr}")
+        
+        # Introduce a slight delay for testing purposes
+        time.sleep(0.1)  # Adjust if necessary
+    except Exception as e:
+        print(f"Error handling client {addr}: {e}")
+    finally:
+        # Ensure the socket connection is closed
+        c.close()
+        print(f"Connection with {addr} closed")
 
 def server():
     try:
         while True:
-            c, addr = s.accept()	 
-            if bool(addr):
-                devices = asyncio.run(scan_bluetooth_devices())
-                print ('Got connection from', addr )
-                device_json = convert_to_json(devices)
-                try:
-                    c.send(json.dumps(device_json).encode()) 
-                    print(f"sent {addr} current bluetooh devices")
-                except Exception as e:
-                    print(e)
-            c.close()
+            print("Waiting for a new connection...")
+            c, addr = s.accept()
+            
+            # Use asyncio to manage asynchronous scanning and handling
+            asyncio.run(handle_client(c, addr))
     except KeyboardInterrupt:
         print("Stopped Server: KeyboardInterrupt")
+    finally:
+        s.close()
+        print("Socket closed")
 
 if __name__ == "__main__":
-    s = socket.socket()		 
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     port = 3000
-    print ("Socket successfully created")
-    s.bind(('127.0.0.1', port))		 
-    print ("socket binded to %s" %(port)) 
-    s.listen(5)	 
-    print ("socket is listening")		 
+    s.bind(('127.0.0.1', port))
+    s.listen(1)
+    print(f"Socket successfully created and listening on port {port}")
+    
     try:
         server()
     except Exception as e:
-        print(e)
-
+        print(f"Server error: {e}")
