@@ -1,0 +1,100 @@
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\TuioDemo.exe.config
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\TuioDemo.exe
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\TuioDemo.pdb
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\EntityFramework.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Data.SQLite.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Data.SQLite.EF6.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Data.SQLite.Linq.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\EntityFramework.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Data.SQLite.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.AssemblyReference.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\obj\Debug\TuioDemo.resources
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.GenerateResource.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.CoreCompileInputs.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.Up2Date
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\obj\Debug\TuioDemo.exe
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\obj\Debug\TuioDemo.pdb
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\DnsClient.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Microsoft.Win32.Registry.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\MongoDB.Bson.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\MongoDB.Driver.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\SharpCompress.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Snappier.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Buffers.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Memory.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Security.AccessControl.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Security.Principal.Windows.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Text.Encoding.CodePages.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\ZstdSharp.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\DnsClient.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Microsoft.Win32.Registry.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\MongoDB.Bson.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\MongoDB.Driver.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\Snappier.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Buffers.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Memory.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Security.AccessControl.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Security.Principal.Windows.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Text.Encoding.CodePages.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\TUIO11_NET-master (3)\TUIO11_NET-master\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\TuioDemo.exe.config
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\TuioDemo.exe
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\TuioDemo.pdb
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\DnsClient.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\EntityFramework.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Microsoft.Win32.Registry.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\MongoDB.Bson.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\MongoDB.Driver.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\SharpCompress.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Snappier.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Buffers.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Data.SQLite.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Data.SQLite.EF6.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Data.SQLite.Linq.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Memory.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Security.AccessControl.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Security.Principal.Windows.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Text.Encoding.CodePages.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\ZstdSharp.dll
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\DnsClient.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\EntityFramework.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Microsoft.Win32.Registry.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\MongoDB.Bson.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\MongoDB.Driver.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\Snappier.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Buffers.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Data.SQLite.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Memory.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Security.AccessControl.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Security.Principal.Windows.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Text.Encoding.CodePages.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.AssemblyReference.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\obj\Debug\TuioDemo.resources
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.GenerateResource.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.CoreCompileInputs.cache
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\obj\Debug\TUIO_DEMO.csproj.Up2Date
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\obj\Debug\TuioDemo.exe
+C:\Users\omarn\Documents\HCI\Project_HCI\interactive-virtual-garden\Gesture_project\TUIO11_NET-master\obj\Debug\TuioDemo.pdb
