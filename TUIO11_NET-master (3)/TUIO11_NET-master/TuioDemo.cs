@@ -674,7 +674,7 @@ public class TuioDemo : Form, TuioListener
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
 								i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height + i);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
 
@@ -686,7 +686,7 @@ public class TuioDemo : Form, TuioListener
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
                                 i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height + i);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							if (pot.WateringNo < 30 && pot.WateringNo >= 20)
@@ -695,7 +695,7 @@ public class TuioDemo : Form, TuioListener
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
                                 i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height + i);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
@@ -704,7 +704,7 @@ public class TuioDemo : Form, TuioListener
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
                                 i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height + i);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							break;
