@@ -424,13 +424,13 @@ public class TuioDemo : Form, TuioListener
 
 		int y = 325;
 
-		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L",652);
+		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60);
 		Pots.Add(Pot1);
-		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC",657);
+		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45);
 		Pots.Add(Pot2);
-		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC",657);
+		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC", this.Height + 45);
 		Pots.Add(Pot3);
-		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R",652);
+		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R", this.Height + 60);
 		Pots.Add(Pot4);
 		
 		//  g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
@@ -672,9 +672,9 @@ public class TuioDemo : Form, TuioListener
 							{
 								pot.phase = 1;
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
-								i = pot.y - pot.min_Y;
+								i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y+ i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
 
@@ -684,27 +684,27 @@ public class TuioDemo : Form, TuioListener
 							{
 								pot.phase = 2;
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
-                                i = pot.y - pot.min_Y;
+                                i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y + i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							if (pot.WateringNo < 30 && pot.WateringNo >= 20)
 							{
 								pot.phase = 3;
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
-                                i = pot.y - pot.min_Y;
+                                i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y + i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
 							{
 								pot.phase = 4;
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
-                                i = pot.y - pot.min_Y;
+                                i = img.Height - pot.min_Y;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y + i, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							break;
