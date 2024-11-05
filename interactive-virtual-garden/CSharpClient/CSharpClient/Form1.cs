@@ -16,6 +16,7 @@ using System.Security.Cryptography;
 using MongoDBOperations;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using ZstdSharp.Unsafe;
 
 namespace CSharpClient
 {
@@ -44,7 +45,6 @@ namespace CSharpClient
                 this.devices = devices;
             }
         }
-
         public class Store_Items
         {
             public Rectangle Rect;
@@ -67,27 +67,6 @@ namespace CSharpClient
                 this.locked = locked;
             }
         }
-        public class Villager
-        {
-
-            public Rectangle Rect;
-            public string position;
-            public int x;
-            public int y;
-            public int width;
-            public int height;
-            public Villager(int x, int y, int width, int height, string position)
-            {
-                this.Rect = new Rectangle(x, y, width, height);
-                this.x = x;
-                this.y = y;
-                this.width = width;
-                this.height = height;
-                this.position = position;//left or go right
-            }
-        }
-        public List<Store_Items> StoreItems = new List<Store_Items>();
-        public Villager villager = new Villager(1400, 450, 201, 300, "C");
         public class Pot
         {
             public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position, long phase = 1, string State = "initial")
@@ -118,25 +97,42 @@ namespace CSharpClient
             public int width;
             public int height;
         }
-        float deltaTime;
-        float hold_timer = 0;
-        long error_Timer = 0;
-        string error_msg = "";
-        string command = "";
-        string mode = "Shop";
+        public class Villager
+        {
+
+            public Rectangle Rect;
+            public string position;
+            public int x;
+            public int y;
+            public int width;
+            public int height;
+            public Villager(int x, int y, int width, int height, string position)
+            {
+                this.Rect = new Rectangle(x, y, width, height);
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.position = position;//left or go right
+            }
+        }
+
+        public List<Store_Items> StoreItems = new List<Store_Items>();
         List<Pot> PotList = new List<Pot>();
-        bool Connection_status;
         Stopwatch stopwatch = new Stopwatch();
         readonly Timer tt = new Timer();
+        Villager villager;
         TcpClient client;
         NetworkStream stream;
-        long lastTime;
-        string msg = "";
-        string last_msg = "";
-        int CurrentPot = 0;
-        int Currentitem = 0;
-        Bitmap img;
         Rectangle src, dest;
+        Bitmap img;
+        int Score = 0 , Currentitem = 0, CurrentPot = 0;
+        float deltaTime , hold_timer = 0;
+        long error_Timer = 0 , lastTime;
+        string error_msg = "" , command = "" ,  mode = "shop";
+        bool Connection_status;
+        string msg = "" , last_msg = "";
+
         public Form1()
         {
 
@@ -171,7 +167,7 @@ namespace CSharpClient
             else
             {
                 hold_timer += deltaTime;
-                if(hold_timer > 0.2)
+                if(hold_timer > 0.1)
                 {
                     command = msg;
                     hold_timer = 0;
@@ -193,6 +189,8 @@ namespace CSharpClient
         }
 
         void Load_store() {
+            
+            villager = new Villager(1400, 450, 201, 300, "C");
             Store_Items temp;
             temp = new Store_Items(360, 500, 111, 111, "Wseed.png", "W" , false);
             StoreItems.Add(temp);
@@ -249,7 +247,7 @@ namespace CSharpClient
                         
                     }
                     break;
-                case "Shop":
+                case "shop":
                     switch (command)
                     {
                         case "left":
@@ -285,8 +283,6 @@ namespace CSharpClient
                             {
                                 PotList[CurrentPot].State = "dug";
                             }
-                            break;
-                        case "hoe":
                             if (PotList[CurrentPot].State == "dug")
                             {
                                 PotList[CurrentPot].State = "seeded";
@@ -299,11 +295,17 @@ namespace CSharpClient
                                     PotList[CurrentPot].WateringNo++;
                                 }
                             }
-                            else
+                            break;
+                        case "hoe":
+                            if (PotList[CurrentPot].State == "watered" && PotList[CurrentPot].WateringNo >= 3)
                             {
-                                error_msg = "no seed is planted";
+                                PotList[CurrentPot].State = "initial";
+                                PotList[CurrentPot].WateringNo = 0;
+                                PotList[CurrentPot].seed = null;
+                                PotList[CurrentPot].phase = 1;
+                                Score += 100;
+                                break;
                             }
-                    
                             break;
                         case "shop":
                             mode = "shop";
@@ -389,7 +391,7 @@ namespace CSharpClient
 
         void DrawingPots(Graphics g)
         {
-            int i = 0;
+            int i = 0 , offset;
             string Hovered;
             foreach (var pot in PotList)
             {
@@ -407,8 +409,9 @@ namespace CSharpClient
                     case "initial":
                         {
                             img = new Bitmap(Hovered + pot.path_initial);
+                            offset = img.Height - pot.height;
                             src = new Rectangle(0, 0, img.Width, img.Height);
-                            dest = new Rectangle(pot.x, pot.y, pot.width, pot.height);
+                            dest = new Rectangle(pot.x, pot.y - offset, pot.width, pot.height + offset);
                             g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
 
@@ -418,8 +421,9 @@ namespace CSharpClient
                         {
 
                             img = new Bitmap(Hovered + pot.path_dug_version);
+                            offset = img.Height - pot.height;
                             src = new Rectangle(0, 0, img.Width, img.Height);
-                            dest = new Rectangle(pot.x, pot.y, pot.width, pot.height);
+                            dest = new Rectangle(pot.x, pot.y - offset, pot.width, pot.height + offset);
                             g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
                             break;
@@ -432,8 +436,9 @@ namespace CSharpClient
                             // Draw the image with the selected phase
 
                             img = new Bitmap(Hovered + "P" + pot.seed + pot.position + phase + ".png");
+                            offset = img.Height - pot.height;
                             src = new Rectangle(0, 0, img.Width, img.Height);
-                            dest = new Rectangle(pot.x, pot.y, pot.width, pot.height);
+                            dest = new Rectangle(pot.x, pot.y - offset, pot.width, pot.height + offset);
                             g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
                             break;
@@ -445,8 +450,9 @@ namespace CSharpClient
                                 pot.phase = 1;
 
                                 img = new Bitmap(Hovered + "P" + pot.seed + pot.position + pot.phase + ".png");
+                                offset = img.Height - pot.height;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - offset, pot.width, pot.height + offset);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
                             }
@@ -455,8 +461,9 @@ namespace CSharpClient
                                 pot.phase = 2;
 
                                 img = new Bitmap(Hovered + "P" + pot.seed + pot.position + pot.phase + ".png");
+                                offset = img.Height - pot.height;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - offset, pot.width, pot.height + offset);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
                             }
@@ -465,8 +472,9 @@ namespace CSharpClient
                                 pot.phase = 3;
 
                                 img = new Bitmap(Hovered + "P" + pot.seed + pot.position + pot.phase + ".png");
+                                offset = img.Height - pot.height;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - offset, pot.width, pot.height + offset);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
                             }
@@ -475,8 +483,9 @@ namespace CSharpClient
                                 pot.phase = 4;
 
                                 img = new Bitmap(Hovered + "P" + pot.seed + pot.position + pot.phase + ".png");
+                                offset = img.Height - pot.height;
                                 src = new Rectangle(0, 0, img.Width, img.Height);
-                                dest = new Rectangle(pot.x, pot.y, pot.width, pot.height);
+                                dest = new Rectangle(pot.x, pot.y - offset, pot.width, pot.height + offset);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 
                             }
@@ -528,7 +537,7 @@ namespace CSharpClient
 
             }
            
-            if (mode == "Shop")
+            if (mode == "shop")
             {
 
                 img = new Bitmap("WALL.png");
