@@ -358,6 +358,9 @@ public class TuioDemo : Form, TuioListener
 	/// <summary>
 	/// 
 	/// </summary>
+	/// 
+	public Bitmap img;
+	public Rectangle src, dest;
 	public List<Pot> Pots = new List<Pot>();
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
@@ -668,22 +671,41 @@ public class TuioDemo : Form, TuioListener
 							if (pot.WateringNo < 10 && pot.WateringNo >= 0)
 							{
 								pot.phase = 1;
-								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x, pot.y, pot.width, pot.height));
+                                img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
+								i = pot.y - pot.min_Y;
+                                src = new Rectangle(0, 0, img.Width, img.Height);
+                                dest = new Rectangle(pot.x, pot.y+ i, pot.width, pot.height);
+                                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+
+                                
 							}
 							if (pot.WateringNo < 20 && pot.WateringNo >= 10)
 							{
 								pot.phase = 2;
-								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 20, pot.width, pot.height));
+                                img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
+                                i = pot.y - pot.min_Y;
+                                src = new Rectangle(0, 0, img.Width, img.Height);
+                                dest = new Rectangle(pot.x, pot.y + i, pot.width, pot.height);
+                                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							if (pot.WateringNo < 30 && pot.WateringNo >= 20)
 							{
 								pot.phase = 3;
-								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 40, pot.width, pot.height));
+                                img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
+                                i = pot.y - pot.min_Y;
+                                src = new Rectangle(0, 0, img.Width, img.Height);
+                                dest = new Rectangle(pot.x, pot.y + i, pot.width, pot.height);
+                                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
 							{
 								pot.phase = 4;
-								g.DrawImage(Image.FromFile("P" + pot.seed + pot.position + pot.phase + ".png"), new Rectangle(pot.x + 20, pot.y - 60, pot.width, pot.height));
+                                img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
+                                i = pot.y - pot.min_Y;
+                                src = new Rectangle(0, 0, img.Width, img.Height);
+                                dest = new Rectangle(pot.x, pot.y + i, pot.width, pot.height);
+                                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
 							break;
 						}
