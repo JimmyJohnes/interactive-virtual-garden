@@ -19,6 +19,49 @@ namespace CSharpClient
     public partial class Form1 : Form
     {
 
+        public class Store_Items
+        {
+            public Rectangle Rect;
+            public int x;
+            public int y;
+            public int width;
+            public int height;
+            public string location;
+            public string type;
+            public bool locked;
+            public Store_Items(int x, int y, int width, int height, string location, string type , bool locked = true)
+            {
+                this.Rect = new Rectangle(x, y, width, height);
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.location = location;
+                this.height = height;
+                this.type = type;
+                this.locked = locked;
+            }
+        }
+        public class Villager
+        {
+
+            public Rectangle Rect;
+            public string position;
+            public int x;
+            public int y;
+            public int width;
+            public int height;
+            public Villager(int x, int y, int width, int height, string position)
+            {
+                this.Rect = new Rectangle(x, y, width, height);
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.position = position;//left or go right
+            }
+        }
+        public List<Store_Items> StoreItems = new List<Store_Items>();
+        public Villager villager = new Villager(1400, 450, 201, 300, "C");
         public class Pot
         {
             public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position, long phase = 1, string State = "initial")
@@ -54,7 +97,7 @@ namespace CSharpClient
         long error_Timer = 0;
         string error_msg = "";
         string command = "";
-        string mode = "Farm";
+        string mode = "Shop";
         List<Pot> PotList = new List<Pot>();
         bool Connection_status;
         Stopwatch stopwatch = new Stopwatch();
@@ -65,6 +108,7 @@ namespace CSharpClient
         string msg = "";
         string last_msg = "";
         int CurrentPot = 0;
+        int Currentitem = 0;
         Bitmap img;
         Rectangle src, dest;
         public Form1()
@@ -92,7 +136,6 @@ namespace CSharpClient
             Manage();
             Invalidate();
         }
-
         void buffer()
         {
             if(last_msg != msg)
@@ -109,13 +152,10 @@ namespace CSharpClient
                 }
             }
         }
-
         void menuHandler()
         {
             
         }
-
-
         void Form1_Load(object sender, EventArgs e)
         {
             Connection_status = ConnectToSocketAsync("localhost", 5000);
@@ -123,9 +163,22 @@ namespace CSharpClient
             lastTime = stopwatch.ElapsedMilliseconds;
             tt.Start();
             load_pots();
+            Load_store();
         }
 
-        
+        void Load_store() {
+            Store_Items temp;
+            temp = new Store_Items(360, 500, 111, 111, "Wseed.png", "W" , false);
+            StoreItems.Add(temp);
+            temp = new Store_Items(560, 500, 111, 111, "Bseed.png", "B");
+            StoreItems.Add(temp);
+            temp = new Store_Items(760, 500, 111, 111, "carrot.png", "C");
+            StoreItems.Add(temp);
+            temp = new Store_Items(960, 500, 111, 111, "potato.png", "P");
+            StoreItems.Add(temp);
+            temp = new Store_Items(1160, 500, 111, 111, "berry.png", "R");
+            StoreItems.Add(temp);
+        }
         void load_pots()
         {
 
@@ -142,18 +195,18 @@ namespace CSharpClient
         {
 
         }
-        void Select( int step)
+        void Select( int step , int max , ref int iterator)
         {
-            CurrentPot += step;
+            iterator += step;
 
             // Wrap around if iterator goes out of bounds
-            if (CurrentPot > 3)
+            if (iterator > max)
             {
-                CurrentPot = 0;
+                iterator = 0;
             }
-            else if (CurrentPot < 0)
+            else if (iterator < 0)
             {
-                CurrentPot = 3;
+                iterator = max;
             }
         }
         void Manage()
@@ -164,16 +217,32 @@ namespace CSharpClient
                 case "Welcome":
                     break;
                 case "Shop":
-
+                    switch (command)
+                    {
+                        case "left":
+                            Select(-1, 4, ref Currentitem);
+                            break;
+                        case "right":
+                            Select(1, 4, ref Currentitem);
+                            break;
+                        case "harvest":
+                            StoreItems[Currentitem].locked = false;
+                            break;
+                        case "hoe":
+                            mode = "Shop";
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case "Farm":
                     switch (command)
                     {
                         case "left":
-                            Select(-1);
+                            Select(-1 , 3 ,ref CurrentPot);
                             break;
                         case "right":
-                            Select(1);
+                            Select(1, 3, ref CurrentPot);
                             break;
   //                      case "shop":
                         //    mode = "shop";
@@ -389,6 +458,29 @@ namespace CSharpClient
             
         }
 
+        void DrawingItems(Graphics g)
+        {
+            int i = 0;
+            string Hovered;
+            foreach (var storeItem in StoreItems)
+            {
+                if (i == CurrentPot)
+                {
+                    Hovered = "H";
+                }
+                else
+                {
+                    Hovered = "";
+                }
+                i++;
+
+                img = new Bitmap(Hovered + storeItem.location);
+                src = new Rectangle(0, 0, img.Width, img.Height);
+                dest = new Rectangle(storeItem.x, storeItem.y, storeItem.width, storeItem.height);
+                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+                
+            }
+        }
         public void drawscene(Graphics g)
         {
             
@@ -406,6 +498,29 @@ namespace CSharpClient
             }
            
             if (mode == "Shop")
+            {
+
+                img = new Bitmap("WALL.png");
+                src = new Rectangle(0, 0, img.Width, img.Height);
+                dest = new Rectangle(0, 0, this.Width, img.Height);
+                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+
+                img = new Bitmap("Stare.png");
+                src = new Rectangle(0, 0, img.Width, img.Height);
+                dest = new Rectangle(villager.x, villager.y, villager.width, villager.height);
+                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+                img = new Bitmap("TABLE.png");
+                src = new Rectangle(0, 0, img.Width, img.Height);
+                dest = new Rectangle(0, 550, this.Width, 530);
+                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+
+                DrawingItems(g);
+
+
+            }
 
             g.DrawString(msg, new Font("Arial", 20, FontStyle.Regular), Brushes.Black, 20, 20);
             g.DrawString(hold_timer.ToString(), new Font("Arial", 20, FontStyle.Regular), Brushes.White, 20, 20);
