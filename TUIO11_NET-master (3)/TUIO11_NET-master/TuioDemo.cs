@@ -241,7 +241,7 @@ public class TuioDemo : Form , TuioListener
     }
     //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-    public int scene=2;
+    public int scene=0;
     public Bitmap small_shovel;
 	public Bitmap objectImage;
     public void AddUserMacAddress(string macAddress, string name)
