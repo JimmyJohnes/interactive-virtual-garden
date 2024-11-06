@@ -27,7 +27,7 @@ async def handle_client(c, addr):
         print(f"Sent Bluetooth devices to {addr}")
         
         # Introduce a slight delay for testing purposes
-        time.sleep(1)  # Adjust if necessary
+        time.sleep(0.1)  # Adjust if necessary
     except Exception as e:
         print(f"Error handling client {addr}: {e}")
     finally:

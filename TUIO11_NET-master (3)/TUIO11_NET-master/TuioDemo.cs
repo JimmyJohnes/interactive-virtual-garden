@@ -41,11 +41,12 @@ using MongoDB.Driver;
 using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 using System.Security.Cryptography.X509Certificates;
+using System.Timers;
 
 public class TuioDemo : Form, TuioListener
 {
 	private readonly IMongoCollection<Device> _deviceCollection;
-
+	
 	public class Store_Items
 	{
 		public Rectangle Rect;
@@ -112,82 +113,81 @@ public class TuioDemo : Form, TuioListener
 			this.devices = devices;
 		}
 	}
-	public bool getBluetoothDevicesAndLogin()
-	{
-		try
-		{
+    public List<Device> getBluetoothDevicesAndLogin()
+    {
+        List<Device> devices = new List<Device>();
+        try
+        {
 
-			String ip = "127.0.0.1";
-			int port = 3000;
-			IPAddress ipAddr = IPAddress.Parse(ip);
-			IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+            String ip = "127.0.0.1";
+            int port = 3000;
+            IPAddress ipAddr = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+            Socket sender = new Socket(ipAddr.AddressFamily,
+                      SocketType.Stream, ProtocolType.Tcp);
 
-			Socket sender = new Socket(ipAddr.AddressFamily,
-					  SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
 
-			try
-			{
+                sender.Connect(localEndPoint);
+                Console.WriteLine($"Socket connected to {ip}:{port}");
 
-				sender.Connect(localEndPoint);
-				Console.WriteLine($"Socket connected to {ip}:{port}");
+                byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+                int byteSent = sender.Send(messageSent);
 
+                byte[] messageReceived = new byte[5024];
 
-				byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
-				int byteSent = sender.Send(messageSent);
+                int byteRecv = sender.Receive(messageReceived);
 
-				byte[] messageReceived = new byte[1024];
+                String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+                Console.WriteLine(Response);
+                DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
+                if (deviceJson?.devices != null)
+                {
+                    foreach (Device device in deviceJson.devices)
+                    {
+                        if (mongoDbOps.DoesAddressExist("users", device.address))
+                        {
+                            Console.WriteLine($"Device with address {device.address} Logged in.");
+                            devices.Add(device);
+                        }
+                        else
+                        {
+                            var document = new BsonDocument
+                         {
+                            { "mac_address", device.address}
+                        };
+                            mongoDbOps.InsertDocument("users", document);
+                            Console.WriteLine($"Device with address {device.address} inserted.");
+                            Console.WriteLine($"Device with address {device.address} is not registered.");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No devices found in the JSON response.");
+                }
+                Console.WriteLine(deviceJson.devices.Count);
+                Console.WriteLine("recieved");
+                foreach (Device device in deviceJson.devices)
+                {
+                    Console.WriteLine($"name:{device.name}, address: {device.address}");
+                }
 
-				int byteRecv = sender.Receive(messageReceived);
+                sender.Shutdown(SocketShutdown.Both);
+                sender.Close();
+                return devices;
+            }
+            catch
+            {
 
-				String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-				Console.WriteLine(Response);
-				DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
-				if (deviceJson?.devices != null)
-				{
-					foreach (Device device in deviceJson.devices)
-					{
-						if (mongoDbOps.DoesAddressExist("users", device.address))
-						{
-							Console.WriteLine($"Device with address {device.address} Logged in.");
-							return true;
-						}
-						else
-						{
-							var document = new BsonDocument
-							 {
-								{ "mac_address", device.address}
-							};
-							mongoDbOps.InsertDocument("users", document);
-							Console.WriteLine($"Device with address {device.address} inserted.");
-							Console.WriteLine($"Device with address {device.address} is not registered.");
-						}
-					}
-				}
-				else
-				{
-					Console.WriteLine("No devices found in the JSON response.");
-				}
-				Console.WriteLine(deviceJson.devices.Count);
-				Console.WriteLine("recieved");
-				foreach (Device device in deviceJson.devices)
-				{
-					Console.WriteLine($"name:{device.name}, address: {device.address}");
-				}
+            }
 
-				sender.Shutdown(SocketShutdown.Both);
-				sender.Close();
-				return false;
-			}
-			catch
-			{
-
-			}
-
-		}
-		catch { }
-		return false;
-	}
-	public DeviceJson getBluetoothDevicesAndUploadToDatabase()
+        }
+        catch { }
+        return devices;
+    }
+    public DeviceJson getBluetoothDevicesAndUploadToDatabase()
 	{
 
 		try
@@ -226,10 +226,9 @@ public class TuioDemo : Form, TuioListener
 						{
 							var document = new BsonDocument
 							 {
-								{ "mac_address", device.address}
+								{"name",device.name },{ "mac_address", device.address}
 							};
 							mongoDbOps.InsertDocument("users", document);
-							Console.WriteLine($"Device with address {device.address} inserted.");
 						}
 						else
 						{
@@ -283,7 +282,7 @@ public class TuioDemo : Form, TuioListener
 	}
 	//string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 	private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-	public int scene = 1;
+	public int scene = 0;
 
 	public Bitmap small_shovel;
 	public Bitmap objectImage;
@@ -355,20 +354,26 @@ public class TuioDemo : Form, TuioListener
 	private Dictionary<long, TuioObject> objectList;
 	private Dictionary<long, TuioCursor> cursorList;
 	private Dictionary<long, TuioBlob> blobList;
-	/// <summary>
-	/// 
-	/// </summary>
-	/// 
-	public Bitmap img;
+    public readonly System.Windows.Forms.Timer timer;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// 
+    public Bitmap img;
 	public Rectangle src, dest;
 	public List<Pot> Pots = new List<Pot>();
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
-
+    List<Device> devices = new List<Device>();
+	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
+
+  
+
 	/// <summary>
 	/// /
 	/// </summary>
@@ -395,7 +400,9 @@ public class TuioDemo : Form, TuioListener
 	private bool verbose;
 
 	private Label displayLabel;
-	Font font = new Font("Minecraft", 9.0f);
+    private Label userLabel;
+	public int shownuser = 0;
+    Font font = new Font("Minecraft", 9.0f);
 	SolidBrush fntBrush = new SolidBrush(Color.Transparent);
 	SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0, 0, 64));
 	SolidBrush curBrush = new SolidBrush(Color.FromArgb(192, 0, 192));
@@ -423,7 +430,7 @@ public class TuioDemo : Form, TuioListener
 
 
 		int y = 325;
-
+		devices = getBluetoothDevicesAndLogin();
 		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60);
 		Pots.Add(Pot1);
 		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45);
@@ -432,14 +439,17 @@ public class TuioDemo : Form, TuioListener
 		Pots.Add(Pot3);
 		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R", this.Height + 60);
 		Pots.Add(Pot4);
-		
-		//  g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
-		//  g.DrawImage(Image.FromFile("Bseed.png"), new Rectangle(new Point(600 - 40, 500), new Size(111, 111)));
-		//  g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point(800 - 40, 500), new Size(111, 111)));
-		//  g.DrawImage(Image.FromFile("potato.png"), new Rectangle(new Point(1000 - 40, 500), new Size(111, 111)));
-		//  g.DrawImage(Image.FromFile("berry.png"), new Rectangle(new Point(1200 - 40, 500), new Size(111, 111)));
+        timer = new System.Windows.Forms.Timer();
+        timer.Interval = 5000; 
+        timer.Tick += Timer_Tick; 
+        timer.Start();
+        //  g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
+        //  g.DrawImage(Image.FromFile("Bseed.png"), new Rectangle(new Point(600 - 40, 500), new Size(111, 111)));
+        //  g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point(800 - 40, 500), new Size(111, 111)));
+        //  g.DrawImage(Image.FromFile("potato.png"), new Rectangle(new Point(1000 - 40, 500), new Size(111, 111)));
+        //  g.DrawImage(Image.FromFile("berry.png"), new Rectangle(new Point(1200 - 40, 500), new Size(111, 111)));
 
-		Store_Items Item1 = new Store_Items(360, 500, 111, 111, "Wseed.png", "HWseed.png", "W");
+        Store_Items Item1 = new Store_Items(360, 500, 111, 111, "Wseed.png", "HWseed.png", "W");
 		Store_Items Item2 = new Store_Items(560, 500, 111, 111, "Bseed.png", "HBseed.png", "B");
 		Store_Items Item3 = new Store_Items(760, 500, 111, 111, "carrot.png", "Hcarrot.png", "C");
 		Store_Items Item4 = new Store_Items(960, 500, 111, 111, "potato.png", "Hpotato.png", "P");
@@ -452,13 +462,22 @@ public class TuioDemo : Form, TuioListener
         displayLabel = new Label();
         displayLabel.Text = Score.ToString();
         displayLabel.Location = new System.Drawing.Point(1920 / 2, 895);
-        displayLabel.AutoSize = true;
         displayLabel.BackColor = Color.Transparent;
         displayLabel.MinimumSize = new System.Drawing.Size(100, 50);
         displayLabel.Font = new Font("Minecraft", 65);
         displayLabel.TextAlign = ContentAlignment.MiddleCenter;
 		displayLabel.Visible = false;
         this.Controls.Add(displayLabel);
+
+        userLabel = new Label();
+        userLabel.Text = Score.ToString();
+		BackColor = Color.White;
+        userLabel.Location = new System.Drawing.Point(1920 / 2, 895);
+        userLabel.MinimumSize = new System.Drawing.Size(100, 50);
+        userLabel.Font = new Font("Minecraft", 15);
+        userLabel.TextAlign = ContentAlignment.MiddleCenter;
+        this.Controls.Add(userLabel);
+
         verbose = true;
 		fullscreen = true;
 		width = window_width;
@@ -496,7 +515,16 @@ public class TuioDemo : Form, TuioListener
 		System.Environment.Exit(0);
 	}
 
-	public void addTuioObject(TuioObject o)
+
+    private void Timer_Tick(object sender, EventArgs e)
+    {
+        devices = getBluetoothDevicesAndLogin();
+
+    }
+
+
+
+    public void addTuioObject(TuioObject o)
 	{
 		lock (objectList)
 		{
@@ -575,11 +603,25 @@ public class TuioDemo : Form, TuioListener
 		if (scene == 0)
 		{
 
-			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			//  if (getBluetoothDevicesAndLogin())
-			//  {
-			//      scene = 1;
-			//  }
+			
+
+			
+			if (devices.Count > 0) { 
+
+				userLabel.Text = devices[shownuser].name;
+
+			}
+			else
+			{
+				userLabel.Text = "NOOOOOO";
+
+            }
+
+            g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
+			 // if (getBluetoothDevicesAndLogin())
+			 // {
+			 //     scene = 1;
+			 // }
 
 
 		}
@@ -948,7 +990,9 @@ public class TuioDemo : Form, TuioListener
 							{
 								START.type = "unselected";
 							}
-                        
+
+							
+
                         }
 						if (scene == 1)
 						{
@@ -1000,9 +1044,40 @@ public class TuioDemo : Form, TuioListener
                                 RETURN2.type = "unselected";
                             }
                         }
+						
 
-					
-					}
+                    }
+                    if (scene == 0)
+                    {
+                        if (tobj.SymbolID == 9)
+                        {
+							if (shownuser < devices.Count - 1)
+							{
+								shownuser = shownuser + 1;
+								userLabel.Text = devices[shownuser].name;
+							}
+							else
+							{
+								shownuser = 0;
+                                userLabel.Text = devices[shownuser].name;
+
+                            }
+                        }
+                        if (tobj.SymbolID == 10)
+                        {
+                            if (shownuser > 0)
+                            {
+                                shownuser = shownuser - 1;
+                                userLabel.Text = devices[shownuser].name;
+                            }
+							else
+							{
+								shownuser = devices.Count - 1;
+                                userLabel.Text = devices[shownuser].name;
+
+                            }
+                        }
+                    }
                     switch (tobj.SymbolID)
                     {
                         case 0:
