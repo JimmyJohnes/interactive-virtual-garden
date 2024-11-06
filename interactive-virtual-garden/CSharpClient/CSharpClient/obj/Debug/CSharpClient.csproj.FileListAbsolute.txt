@@ -68,3 +68,9 @@ F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\C
 F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.Text.Encoding.CodePages.xml
 F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.Threading.Tasks.Extensions.xml
 F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\obj\Debug\CSharpCl.9182C269.Up2Date
+F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.Text.Encodings.Web.dll
+F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.Text.Json.dll
+F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.ValueTuple.dll
+F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.Text.Encodings.Web.xml
+F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.Text.Json.xml
+F:\Subjects\interactive-virtual-garden\interactive-virtual-garden\CSharpClient\CSharpClient\bin\Debug\System.ValueTuple.xml
