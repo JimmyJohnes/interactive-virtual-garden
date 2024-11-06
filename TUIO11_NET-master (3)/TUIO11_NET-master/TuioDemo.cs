@@ -676,9 +676,6 @@ public class TuioDemo : Form, TuioListener
                                 src = new Rectangle(0, 0, img.Width, img.Height);
                                 dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height + i);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
-
-
-                                
 							}
 							if (pot.WateringNo < 20 && pot.WateringNo >= 10)
 							{
