@@ -56,6 +56,7 @@ public class TuioDemo : Form, TuioListener
 		public string selected_img;
 		public string unselected_img;
 		public string type;
+		public bool ispurchased=false;
 		public Store_Items(int x, int y, int width, int height, string selected, string unselected, string type)
 		{
 			this.Rect = new Rectangle(x, y, width, height);
@@ -283,7 +284,7 @@ public class TuioDemo : Form, TuioListener
 	}
 	//string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 	private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-	public int scene = 1;
+	public int scene = 3;
 
 	public Bitmap small_shovel;
 	public Bitmap objectImage;
@@ -322,7 +323,7 @@ public class TuioDemo : Form, TuioListener
 
 	public class Pot
 	{
-		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position,int min_Y, int phase = 1, string State = "initial" )
+		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position,int min_Y,int income, int phase = 1, string State = "initial" )
 		{
 			this.path_initial = path_initial;
 			this.path_dug_version = path_dug;
@@ -335,8 +336,10 @@ public class TuioDemo : Form, TuioListener
 			this.position = position;
 			this.phase = phase;
 			this.min_Y = min_Y;
+			this.income=income;
 		}
 		public int min_Y;
+		public int income;
 		public string path_initial;
 		public string path_dug_version;
 		public Rectangle Rect;
@@ -365,10 +368,17 @@ public class TuioDemo : Form, TuioListener
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
+
+    public Button TUTORIAL = new Button(680, 700, 606, 99, "TUTORIAL.png", "HTUTORIAL.png");
+
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
 
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
+
+    public Button LEFT = new Button(30, 70, 273, 99, "LEFT.png", "HLEFT.png");
+    public Button RIGHT = new Button(30, 70, 273, 99, "RIGHT.png", "HRIGHT.png");
+
 	/// <summary>
 	/// /
 	/// </summary>
@@ -395,7 +405,7 @@ public class TuioDemo : Form, TuioListener
 	private bool verbose;
 
 	private Label displayLabel;
-	Font font = new Font("Minecraft", 9.0f);
+	Font font = new Font("Minecraft", 8.0f);
 	SolidBrush fntBrush = new SolidBrush(Color.Transparent);
 	SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0, 0, 64));
 	SolidBrush curBrush = new SolidBrush(Color.FromArgb(192, 0, 192));
@@ -424,13 +434,13 @@ public class TuioDemo : Form, TuioListener
 
 		int y = 325;
 
-		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60);
+		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60,0);
 		Pots.Add(Pot1);
-		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45);
+		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45,0);
 		Pots.Add(Pot2);
-		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC", this.Height + 45);
+		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC", this.Height + 45,0);
 		Pots.Add(Pot3);
-		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R", this.Height + 60);
+		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R", this.Height + 60,0);
 		Pots.Add(Pot4);
 		
 		//  g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
@@ -455,7 +465,7 @@ public class TuioDemo : Form, TuioListener
         displayLabel.AutoSize = true;
         displayLabel.BackColor = Color.Transparent;
         displayLabel.MinimumSize = new System.Drawing.Size(100, 50);
-        displayLabel.Font = new Font("Minecraft", 65);
+        displayLabel.Font = new Font("Minecraft", 58);
         displayLabel.TextAlign = ContentAlignment.MiddleCenter;
 		displayLabel.Visible = false;
         this.Controls.Add(displayLabel);
@@ -593,7 +603,12 @@ public class TuioDemo : Form, TuioListener
 			g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
 		}
-		int imgwidth = 90;
+		else if (scene == 3)
+		{
+            g.DrawImage(Image.FromFile("TUIOtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+        }
+
+        int imgwidth = 90;
 		int imgheight = 90;
 		int y = 325;
 		if (scene == 1 || scene == 2)
@@ -614,6 +629,37 @@ public class TuioDemo : Form, TuioListener
             else
             {
                 g.DrawImage(Image.FromFile(START.selected_img), new Rectangle(new Point(START.x, START.y), new Size(START.width, START.height)));
+            }
+			if (TUTORIAL.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(TUTORIAL.unselected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(TUTORIAL.selected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+            }
+        }
+
+		else if(scene ==3)
+		{
+            if (RIGHT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(RIGHT.unselected_img), new Rectangle(new Point(RIGHT.x, RIGHT.y), new Size(RIGHT.width, RIGHT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(RIGHT.selected_img), new Rectangle(new Point(RIGHT.x, RIGHT.y), new Size(RIGHT.width, RIGHT.height)));
+            }
+        }
+		else if(scene ==4)
+		{
+            if (LEFT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(LEFT.unselected_img), new Rectangle(new Point(LEFT.x, LEFT.y), new Size(LEFT.width, LEFT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(LEFT.selected_img), new Rectangle(new Point(LEFT.x, LEFT.y), new Size(LEFT.width, LEFT.height)));
             }
         }
 		
@@ -829,7 +875,7 @@ public class TuioDemo : Form, TuioListener
 									pot.WateringNo = 0;
 									pot.seed = null;
 									pot.phase = 1;
-									Score += 100;
+									Score += pot.income;
 								    displayLabel.Text=Score.ToString();
 						            break;
 						        }
@@ -844,6 +890,7 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "B";
+									pot.income = 100;
 									break;
 								}
 							}
@@ -857,6 +904,7 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "W";
+									pot.income = 50;
 									break;
 								}
 							}
@@ -870,6 +918,8 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "C";
+									pot.income = 120;
+
 									break;
 								}
 							}
@@ -883,7 +933,9 @@ public class TuioDemo : Form, TuioListener
 							 {
 							     pot.State = "seeded";
 								    pot.seed = "P";
-									break;
+                                pot.income = 150;
+
+                                break;
 								}
 							}
 						}
@@ -896,7 +948,9 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "R";
-									break;
+									 pot.income = 200;
+
+                                break;
 								}
 							}
 						}
@@ -944,6 +998,19 @@ public class TuioDemo : Form, TuioListener
 							else
 							{
 								START.type = "unselected";
+							} 
+							if (Store_Intersect(ItemRECT, TUTORIAL.Rect))
+                            {
+								TUTORIAL.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+									scene = 3;
+                                }
+                                break;
+                            }
+							else
+							{
+								TUTORIAL.type = "unselected";
 							}
                         
                         }
@@ -1013,32 +1080,32 @@ public class TuioDemo : Form, TuioListener
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg2.jpg");
                             break;
                         case 2:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "H1.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "H2.png");
 
 							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
 							break;
                         case 3:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "BEETROOT.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBEETROOT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 4:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WHEAT.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sWHEAT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 5:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "carrot.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sCARROT.png");
 							
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 6:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "potato.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sPOTATO.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 7:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "berry.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBERRY.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break; 
