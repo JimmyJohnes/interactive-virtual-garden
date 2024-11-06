@@ -283,7 +283,7 @@ public class TuioDemo : Form, TuioListener
 	}
 	//string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 	private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-	public int scene = 3;
+	public int scene = 0;
 
 	public Bitmap small_shovel;
 	public Bitmap objectImage;
@@ -378,8 +378,9 @@ public class TuioDemo : Form, TuioListener
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
 
-    public Button LEFT = new Button(30, 70, 273, 99, "LEFT.png", "HLEFT.png");
-    public Button RIGHT = new Button(30, 70, 273, 99, "RIGHT.png", "HRIGHT.png");
+    public Button LEFT = new Button(150, 500, 90, 90, "LEFT.png", "HLEFT.png");
+    public Button RIGHT = new Button(1750, 500, 90, 90, "RIGHT.png", "HRIGHT.png");
+    public Button EXIT = new Button(1650, 100, 90, 90, "EXIT.png", "HEXIT.png");
 
 	/// <summary>
 	/// /
@@ -409,7 +410,7 @@ public class TuioDemo : Form, TuioListener
 	private Label displayLabel;
     private Label userLabel;
 	public int shownuser = 0;
-    Font font = new Font("Minecraft", 9.0f);
+    Font font = new Font("Minecraft", 8.0f);
 	SolidBrush fntBrush = new SolidBrush(Color.Transparent);
 	SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0, 0, 64));
 	SolidBrush curBrush = new SolidBrush(Color.FromArgb(192, 0, 192));
@@ -474,6 +475,7 @@ public class TuioDemo : Form, TuioListener
         displayLabel.Font = new Font("Minecraft", 58);
         displayLabel.TextAlign = ContentAlignment.MiddleCenter;
 		displayLabel.Visible = false;
+		displayLabel.AutoSize=true;
         this.Controls.Add(displayLabel);
 
         userLabel = new Label();
@@ -607,14 +609,16 @@ public class TuioDemo : Form, TuioListener
 		}
 		small_shovel.MakeTransparent();
 		Graphics g = pevent.Graphics;
+		userLabel.Visible = false;
 		g.Clear(Color.White);
 		if (scene == 0)
 		{
 
-			
 
-			
-			if (devices.Count > 0) { 
+			userLabel.Visible = true;
+
+			if (devices.Count > 0)
+			{
 
 				userLabel.Text = devices[shownuser].name;
 
@@ -623,13 +627,13 @@ public class TuioDemo : Form, TuioListener
 			{
 				userLabel.Text = "NOOOOOO";
 
-            }
+			}
 
-            g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			 // if (getBluetoothDevicesAndLogin())
-			 // {
-			 //     scene = 1;
-			 // }
+			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
+			// if (getBluetoothDevicesAndLogin())
+			// {
+			//     scene = 1;
+			// }
 
 
 		}
@@ -645,7 +649,11 @@ public class TuioDemo : Form, TuioListener
 		}
 		else if (scene == 3)
 		{
-            g.DrawImage(Image.FromFile("TUIOtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+			g.DrawImage(Image.FromFile("TUIOtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+		}
+		else if (scene == 4)
+		{
+            g.DrawImage(Image.FromFile("Gtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
         }
 
         int imgwidth = 90;
@@ -690,6 +698,14 @@ public class TuioDemo : Form, TuioListener
             {
                 g.DrawImage(Image.FromFile(RIGHT.selected_img), new Rectangle(new Point(RIGHT.x, RIGHT.y), new Size(RIGHT.width, RIGHT.height)));
             }
+			if (EXIT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(EXIT.unselected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(EXIT.selected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
         }
 		else if(scene ==4)
 		{
@@ -701,6 +717,16 @@ public class TuioDemo : Form, TuioListener
             {
                 g.DrawImage(Image.FromFile(LEFT.selected_img), new Rectangle(new Point(LEFT.x, LEFT.y), new Size(LEFT.width, LEFT.height)));
             }
+
+            if (EXIT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(EXIT.unselected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(EXIT.selected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
+
         }
 		
 		else if (scene == 1)
@@ -1054,6 +1080,71 @@ public class TuioDemo : Form, TuioListener
 								TUTORIAL.type = "unselected";
 							}
                         
+                        }
+						if (scene ==3)
+						{
+                            Rectangle ItemRECT = new Rectangle(ox +size/2, oy - size, size+100, size+100);
+							g.FillRectangle(objBrush,ItemRECT);
+
+                            if (Store_Intersect(ItemRECT, RIGHT.Rect))
+                            {
+                                RIGHT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 4;
+                                    timer.Stop();
+                                }
+                            }
+                            else
+                            {
+                                RIGHT.type = "unselected";
+                            }  
+							if (Store_Intersect(ItemRECT, EXIT.Rect))
+                            {
+                                EXIT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 0;
+                                    timer.Stop();
+                                }
+                                
+                            }
+                            else
+                            {
+                                EXIT.type = "unselected";
+                            }
+                        }	
+
+						if (scene ==4)
+						{
+                            Rectangle ItemRECT = new Rectangle(ox - size / 2, oy - size / 2, size+100, size+100);
+
+                            if (Store_Intersect(ItemRECT, LEFT.Rect))
+                            {
+                                LEFT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 3;
+                                    timer.Stop();
+                                }
+                            }
+                            else
+                            {
+                                LEFT.type = "unselected";
+                            }  
+							if (Store_Intersect(ItemRECT, EXIT.Rect))
+                            {
+                                EXIT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 0;
+                                    timer.Stop();
+                                }
+                            }
+                            else
+                            {
+                                EXIT.type = "unselected";
+                            }
                         }
 						if (scene == 1)
 						{
