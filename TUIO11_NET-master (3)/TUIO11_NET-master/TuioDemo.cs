@@ -140,12 +140,12 @@ public class TuioDemo : Form, TuioListener
                 int byteRecv = sender.Receive(messageReceived);
 
                 String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-                Console.WriteLine(Response);
                 DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
                 if (deviceJson?.devices != null)
                 {
                     foreach (Device device in deviceJson.devices)
                     {
+                        Console.WriteLine("response:" + device.name+" "+device.address);
                         if (mongoDbOps.DoesAddressExist("users", device.address))
                         {
                             Console.WriteLine($"Device with address {device.address} Logged in.");
@@ -155,7 +155,7 @@ public class TuioDemo : Form, TuioListener
                         {
                             var document = new BsonDocument
                          {
-                            { "mac_address", device.address}
+								{"name",device.name },{ "address", device.address}
                         };
                             mongoDbOps.InsertDocument("users", document);
                             Console.WriteLine($"Device with address {device.address} inserted.");
@@ -226,7 +226,7 @@ public class TuioDemo : Form, TuioListener
 						{
 							var document = new BsonDocument
 							 {
-								{"name",device.name },{ "mac_address", device.address}
+								{"name",device.name },{ "address", device.address}
 							};
 							mongoDbOps.InsertDocument("users", document);
 						}
@@ -292,7 +292,7 @@ public class TuioDemo : Form, TuioListener
 		var document = new BsonDocument
 		{
 			{"username",name},
-			{ "mac_address", macAddress}
+			{ "address", macAddress}
 		};
 
 		// Call the InsertDocument method to add the document to the "users" collection
@@ -465,6 +465,7 @@ public class TuioDemo : Form, TuioListener
         displayLabel.BackColor = Color.Transparent;
         displayLabel.MinimumSize = new System.Drawing.Size(100, 50);
         displayLabel.Font = new Font("Minecraft", 65);
+		displayLabel.AutoSize = true;
         displayLabel.TextAlign = ContentAlignment.MiddleCenter;
 		displayLabel.Visible = false;
         this.Controls.Add(displayLabel);
@@ -475,6 +476,7 @@ public class TuioDemo : Form, TuioListener
         userLabel.Location = new System.Drawing.Point(1920 / 2, 895);
         userLabel.MinimumSize = new System.Drawing.Size(100, 50);
         userLabel.Font = new Font("Minecraft", 15);
+		userLabel.AutoSize = true;
         userLabel.TextAlign = ContentAlignment.MiddleCenter;
         this.Controls.Add(userLabel);
 
@@ -980,6 +982,7 @@ public class TuioDemo : Form, TuioListener
                                 if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
                                 {
 									scene = 1;
+									timer.Stop();
                                 }
                                 break;
                             }
@@ -1001,6 +1004,10 @@ public class TuioDemo : Form, TuioListener
                                 if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
                                 {
 									scene --;
+									if(scene == 0)
+									{
+										timer.Start();
+									}
                                 }
                                 break;
                             }
@@ -1015,6 +1022,7 @@ public class TuioDemo : Form, TuioListener
                                 if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
                                 {
 									scene = 2;
+
                                 }
                                 break;
                             }

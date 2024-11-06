@@ -7,7 +7,7 @@ import bluetooth_scan
 def convert_to_json(devices):
     device_json = {
         "devices": [
-            {"name": device.name, "address": device.address} for device in devices
+            {"name": device.name, "mac_address": device.address} for device in devices
         ]
     }
     return device_json

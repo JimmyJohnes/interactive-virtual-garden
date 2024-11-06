@@ -44,7 +44,7 @@ def get_connected_bluetooth_devices():
                 # Append device details as a dictionary
                 device_list.append({
                     "name": name,
-                    "mac_address": formatted_mac
+                    "address": formatted_mac
                 })
         else:
             return json.dumps({"devices": []})  # No devices found

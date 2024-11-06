@@ -32,7 +32,7 @@ namespace MongoDBOperations
         public void UpdateDocument(string collectionName, string name, int newAge)
         {
             var collection = database.GetCollection<BsonDocument>(collectionName);
-            var filter = Builders<BsonDocument>.Filter.Eq("Name", name);
+            var filter = Builders<BsonDocument>.Filter.Eq("name", name);
             var update = Builders<BsonDocument>.Update.Set("Age", newAge);
             collection.UpdateOne(filter, update);
             Console.WriteLine("Document updated.");
@@ -41,7 +41,7 @@ namespace MongoDBOperations
         public void DeleteDocument(string collectionName, string name)
         {
             var collection = database.GetCollection<BsonDocument>(collectionName);
-            var filter = Builders<BsonDocument>.Filter.Eq("Name", name);
+            var filter = Builders<BsonDocument>.Filter.Eq("name", name);
             collection.DeleteOne(filter);
             Console.WriteLine("Document deleted.");
         }
@@ -49,9 +49,8 @@ namespace MongoDBOperations
         public bool DoesAddressExist(string collectionName, string address)
         {
             var collection = database.GetCollection<BsonDocument>(collectionName);
-            var filter = Builders<BsonDocument>.Filter.Eq("mac_address", address);
+            var filter = Builders<BsonDocument>.Filter.Eq("address", address);
             var count = collection.Find(filter).Limit(1).CountDocuments();
-            Console.WriteLine("count in db:"+count);
             return count > 0;
         }
     }
