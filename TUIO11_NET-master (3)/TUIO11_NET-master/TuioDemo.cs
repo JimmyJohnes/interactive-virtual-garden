@@ -438,7 +438,7 @@ public class TuioDemo : Form, TuioListener
 
 		int y = 325;
 		devices = getBluetoothDevicesAndLogin();
-		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60);
+		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60,0);
 		Pots.Add(Pot1);
 		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45,0);
 		Pots.Add(Pot2);
