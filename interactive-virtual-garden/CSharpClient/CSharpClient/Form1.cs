@@ -27,15 +27,21 @@ namespace CSharpClient
         {
             public String name { get; set; }
             public String address { get; set; }
+            public int score;
+            public List<String> unlockables { get; set; }
             public Device()
             {
                 this.name = "";
                 this.address = "";
+                this.score = 0;
+                this.unlockables = new List<String>();
             }
-            public Device(String name, String address)
+            public Device(String name, String address, int score, List<String> unlockables)
             {
                 this.name = name;
                 this.address = address;
+                this.unlockables.Add(name);
+                this.score = score;
             }
         }
         public class DeviceJson
@@ -48,7 +54,7 @@ namespace CSharpClient
         }
 
         private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-       public class Store_Items
+        public class Store_Items
         {
             public Rectangle Rect;
             public int x;
@@ -120,8 +126,9 @@ namespace CSharpClient
             }
         }
 
-        public bool getBluetoothDevicesAndLogin()
+        public List<Device> getBluetoothDevicesAndLogin()
         {
+            List<Device> devices = new List<Device>();
             try
             {
 
@@ -129,7 +136,6 @@ namespace CSharpClient
                 int port = 3000;
                 IPAddress ipAddr = IPAddress.Parse(ip);
                 IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
-
                 Socket sender = new Socket(ipAddr.AddressFamily,
                           SocketType.Stream, ProtocolType.Tcp);
 
@@ -139,32 +145,31 @@ namespace CSharpClient
                     sender.Connect(localEndPoint);
                     Console.WriteLine($"Socket connected to {ip}:{port}");
 
-
                     byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
                     int byteSent = sender.Send(messageSent);
 
-                    byte[] messageReceived = new byte[1024];
+                    byte[] messageReceived = new byte[5024];
 
                     int byteRecv = sender.Receive(messageReceived);
 
                     String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-                    Console.WriteLine(Response);
                     DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
                     if (deviceJson?.devices != null)
                     {
                         foreach (Device device in deviceJson.devices)
                         {
+                            Console.WriteLine("response:" + device.name + " " + device.address);
                             if (mongoDbOps.DoesAddressExist("users", device.address))
                             {
                                 Console.WriteLine($"Device with address {device.address} Logged in.");
-                                return true;
+                                devices.Add(device);
                             }
                             else
                             {
                                 var document = new BsonDocument
-                             {
-                                { "mac_address", device.address}
-                            };
+                         {
+                                {"name",device.name },{ "address", device.address}
+                        };
                                 mongoDbOps.InsertDocument("users", document);
                                 Console.WriteLine($"Device with address {device.address} inserted.");
                                 Console.WriteLine($"Device with address {device.address} is not registered.");
@@ -184,7 +189,7 @@ namespace CSharpClient
 
                     sender.Shutdown(SocketShutdown.Both);
                     sender.Close();
-                    return false;
+                    return devices;
                 }
                 catch
                 {
@@ -193,7 +198,7 @@ namespace CSharpClient
 
             }
             catch { }
-            return false;
+            return devices;
         }
         public DeviceJson getBluetoothDevicesAndUploadToDatabase()
         {
@@ -294,18 +299,19 @@ namespace CSharpClient
         List<Pot> PotList = new List<Pot>();
         Stopwatch stopwatch = new Stopwatch();
         readonly Timer tt = new Timer();
+        List<Device> devices = new List<Device>();
         Villager villager;
         TcpClient client;
         NetworkStream stream;
         Rectangle src, dest;
         Bitmap img;
-        int Score = 0 , Currentitem = 0, CurrentPot = 0;
-        float deltaTime , hold_timer = 0;
+        int Score = 0 , Currentitem = 0, CurrentPot = 0 , Currentdevice = 0;
+        float deltaTime , hold_timer = 0 , Blue_Buf = 0;
         long error_Timer = 0 , lastTime;
-        string error_msg = "" , command = "" ,  mode = "shop";
+        string error_msg = "" , command = "" ,  mode = "Welcome";
         bool Connection_status;
         string msg = "" , last_msg = "";
-
+        //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
         public Form1()
         {
 
@@ -329,7 +335,24 @@ namespace CSharpClient
             }
             buffer();
             Manage();
+            blue_buf();
             Invalidate();
+        }
+
+        void blue_buf()
+        {
+            if (mode == "Welcome")
+            {
+                if(Blue_Buf > 4) {
+
+                    Blue_Buf = 0;
+                    devices = getBluetoothDevicesAndLogin(); 
+                }
+                else
+                {
+                    Blue_Buf += deltaTime;
+                }
+            }
         }
         void buffer()
         {
@@ -359,6 +382,7 @@ namespace CSharpClient
             tt.Start();
             load_pots();
             Load_store();
+            devices = getBluetoothDevicesAndLogin();
         }
         void Load_store() {
             
@@ -387,10 +411,6 @@ namespace CSharpClient
             temp = new Pot("S4.png", "P4.png", 1495, 652, 425, 360, "R");
             PotList.Add(temp);
         }
-        void load_background()
-        {
-
-        }
         void Select( int step , int max , ref int iterator)
         {
             iterator += step;
@@ -414,7 +434,13 @@ namespace CSharpClient
                     switch (command)
                     {
                         case "shop":
-                            mode = "Farm";
+                            mode = "";
+                            break;
+                        case "left":
+                            Select(-1, devices.Count, ref Currentdevice);
+                                break;
+                        case "right":
+                            Select(1 , devices.Count, ref Currentdevice);
                             break;
                         default:
                             break;
@@ -489,7 +515,6 @@ namespace CSharpClient
             }
             command = "";
         }
-
         async Task<bool> StreamAsync()
         {
 
@@ -515,7 +540,6 @@ namespace CSharpClient
             
             return true;
         }
-
         bool ConnectToSocketAsync(string host, int portNumber)
         {
             try
@@ -531,7 +555,6 @@ namespace CSharpClient
                 return false;
             }
         }
-
         async Task<string> ReceiveMessageAsync()
         {
             if (stream == null)
@@ -558,7 +581,6 @@ namespace CSharpClient
                 return null;
             }
         }
-
         void DrawingPots(Graphics g)
         {
             int i = 0 , offset;
@@ -667,21 +689,14 @@ namespace CSharpClient
 
             
         }
-
         void DrawingItems(Graphics g)
         {
             int i = 0;
             string Hovered;
             foreach (var storeItem in StoreItems)
             {
-                if (i == Currentitem)
-                {
-                    Hovered = "H";
-                }
-                else
-                {
-                    Hovered = "";
-                }
+                Hovered = (i == Currentitem) ? "H" : "";
+
                 i++;
 
                 img = new Bitmap(Hovered + storeItem.location);
@@ -696,43 +711,54 @@ namespace CSharpClient
             
             g.Clear(Color.Blue);
 
-            if(mode == "")
-            if (mode =="Farm")
+            switch(mode)
             {
-                img = new Bitmap("FARM.png");
-                src = new Rectangle(0, 0, img.Width, img.Height);
-                dest = new Rectangle(0, 0, this.Width, img.Height);
-                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
-                DrawingPots(g);
+                case "Welcome":
+                    img = new Bitmap("FARMCRAFT2.png");
+                    src = new Rectangle(0, 0, img.Width, img.Height);
+                    dest = new Rectangle(0, 0, this.Width, img.Height);
+                    g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+
+                    if (devices.Count > 0)
+                    {
+                        g.DrawString("Current Device: " + devices[Currentdevice].name, new Font("Arial", 20, FontStyle.Regular), Brushes.White, 200, 400);
+                    }
+
+                    break;
+                case "Farm":
+                    img = new Bitmap("FARM.png");
+                    src = new Rectangle(0, 0, img.Width, img.Height);
+                    dest = new Rectangle(0, 0, this.Width, img.Height);
+                    g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+                    DrawingPots(g);
+                    break;
+                case "shop":
+
+                    img = new Bitmap("WALL.png");
+                    src = new Rectangle(0, 0, img.Width, img.Height);
+                    dest = new Rectangle(0, 0, this.Width, img.Height);
+                    g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+
+                    img = new Bitmap("Stare.png");
+                    src = new Rectangle(0, 0, img.Width, img.Height);
+                    dest = new Rectangle(villager.x, villager.y, villager.width, villager.height);
+                    g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+                    img = new Bitmap("TABLE.png");
+                    src = new Rectangle(0, 0, img.Width, img.Height);
+                    dest = new Rectangle(0, 550, this.Width, 530);
+                    g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
+
+
+                    DrawingItems(g);
+                    break;
+
 
             }
-           
-            if (mode == "shop")
-            {
-
-                img = new Bitmap("WALL.png");
-                src = new Rectangle(0, 0, img.Width, img.Height);
-                dest = new Rectangle(0, 0, this.Width, img.Height);
-                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
-
-
-                img = new Bitmap("Stare.png");
-                src = new Rectangle(0, 0, img.Width, img.Height);
-                dest = new Rectangle(villager.x, villager.y, villager.width, villager.height);
-                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
-
-                img = new Bitmap("TABLE.png");
-                src = new Rectangle(0, 0, img.Width, img.Height);
-                dest = new Rectangle(0, 550, this.Width, 530);
-                g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
-
-
-                DrawingItems(g);
-
-
-            }
-
-            g.DrawString(msg, new Font("Arial", 20, FontStyle.Regular), Brushes.Black, 20, 20);
+            g.DrawString(msg, new Font("Arial", 20, FontStyle.Regular), Brushes.White, 90, 20);
+            
             g.DrawString(hold_timer.ToString(), new Font("Arial", 20, FontStyle.Regular), Brushes.White, 20, 20);
 
 

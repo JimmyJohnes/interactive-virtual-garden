@@ -29,14 +29,20 @@ namespace MongoDBOperations
             return collection.Find(new BsonDocument()).ToList();
         }
 
-        public void UpdateDocument(string collectionName, string name, int newAge)
+        public void UpdateDocument(string collectionName, string Address, List<string> unlockables, int Score)
         {
             var collection = database.GetCollection<BsonDocument>(collectionName);
-            var filter = Builders<BsonDocument>.Filter.Eq("Name", name);
-            var update = Builders<BsonDocument>.Update.Set("Age", newAge);
+            var filter = Builders<BsonDocument>.Filter.Eq("address", Address);
+
+            // Define the updates for Age and Unlockables
+            var update = Builders<BsonDocument>.Update
+                            .Set("score", Score)
+                            .Set("unlockables", new BsonArray(unlockables));
+
             collection.UpdateOne(filter, update);
             Console.WriteLine("Document updated.");
         }
+
 
         public void DeleteDocument(string collectionName, string name)
         {
