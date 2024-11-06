@@ -26,7 +26,7 @@ def load_templates(filename="templates.pkl"):
         return []
 
 # Function to start a socket server for communication with the C# application
-def start_socket_server(host='localhost', port=12345):
+def start_socket_server(host='localhost', port= 5000):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(1)
