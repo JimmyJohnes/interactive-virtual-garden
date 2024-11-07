@@ -58,6 +58,7 @@ public class TuioDemo : Form, TuioListener
 		public string selected_img;
 		public string unselected_img;
 		public string type;
+		public bool ispurchased=false;
 		public Store_Items(int x, int y, int width, int height, string selected, string unselected, string type)
 		{
 			this.Rect = new Rectangle(x, y, width, height);
@@ -333,7 +334,7 @@ public class TuioDemo : Form, TuioListener
 
 	public class Pot
 	{
-		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position,int min_Y, int phase = 1, string State = "initial" )
+		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position,int min_Y,int income, int phase = 1, string State = "initial" )
 		{
 			this.path_initial = path_initial;
 			this.path_dug_version = path_dug;
@@ -346,8 +347,10 @@ public class TuioDemo : Form, TuioListener
 			this.position = position;
 			this.phase = phase;
 			this.min_Y = min_Y;
+			this.income=income;
 		}
 		public int min_Y;
+		public int income;
 		public string path_initial;
 		public string path_dug_version;
 		public Rectangle Rect;
@@ -379,13 +382,18 @@ public class TuioDemo : Form, TuioListener
 	public List<Button> Buttons = new List<Button>();
 	public List<String> unlocked = new List<String>();
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
+
+    public Button TUTORIAL = new Button(680, 700, 606, 99, "TUTORIAL.png", "HTUTORIAL.png");
+
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
 	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
 
-  
+    public Button LEFT = new Button(150, 500, 90, 90, "LEFT.png", "HLEFT.png");
+    public Button RIGHT = new Button(1750, 500, 90, 90, "RIGHT.png", "HRIGHT.png");
+    public Button EXIT = new Button(1650, 100, 90, 90, "EXIT.png", "HEXIT.png");
 
 	/// <summary>
 	/// /
@@ -415,7 +423,7 @@ public class TuioDemo : Form, TuioListener
 	private Label displayLabel;
     private Label userLabel;
 	public int shownuser = 0;
-    Font font = new Font("Minecraft", 9.0f);
+    Font font = new Font("Minecraft", 8.0f);
 	SolidBrush fntBrush = new SolidBrush(Color.Transparent);
 	SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0, 0, 64));
 	SolidBrush curBrush = new SolidBrush(Color.FromArgb(192, 0, 192));
@@ -446,12 +454,13 @@ public class TuioDemo : Form, TuioListener
 		devices = getBluetoothDevicesAndLogin();
 		
 		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60);
+		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60,0);
 		Pots.Add(Pot1);
-		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45);
+		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45,0);
 		Pots.Add(Pot2);
-		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC", this.Height + 45);
+		Pot Pot3 = new Pot("S3.png", "P3.png", 1065, 657, this.Width + 5, this.Height + 45, "RC", this.Height + 45,0);
 		Pots.Add(Pot3);
-		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R", this.Height + 60);
+		Pot Pot4 = new Pot("S4.png", "P4.png", 1495, 652, this.Width + 125, this.Height + 60, "R", this.Height + 60,0);
 		Pots.Add(Pot4);
         timer = new System.Windows.Forms.Timer();
         timer.Interval = 5000; 
@@ -478,10 +487,10 @@ public class TuioDemo : Form, TuioListener
         displayLabel.Location = new System.Drawing.Point(1920 / 2, 895);
         displayLabel.BackColor = Color.Transparent;
         displayLabel.MinimumSize = new System.Drawing.Size(100, 50);
-        displayLabel.Font = new Font("Minecraft", 65);
-		displayLabel.AutoSize = true;
+        displayLabel.Font = new Font("Minecraft", 58);
         displayLabel.TextAlign = ContentAlignment.MiddleCenter;
 		displayLabel.Visible = false;
+		displayLabel.AutoSize=true;
         this.Controls.Add(displayLabel);
 
         userLabel = new Label();
@@ -630,10 +639,16 @@ public class TuioDemo : Form, TuioListener
 		}
 		small_shovel.MakeTransparent();
 		Graphics g = pevent.Graphics;
+		userLabel.Visible = false;
 		g.Clear(Color.White);
 		if (scene == 0)
 		{
-			if (devices.Count > 0) { 
+
+
+			userLabel.Visible = true;
+
+			if (devices.Count > 0)
+			{
 
 				userLabel.Text = devices[shownuser].name;
 
@@ -642,13 +657,13 @@ public class TuioDemo : Form, TuioListener
 			{
 				userLabel.Text = "No devices detected";
 
-            }
+			}
 
-            g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			 // if (getBluetoothDevicesAndLogin())
-			 // {
-			 //     scene = 1;
-			 // }
+			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
+			// if (getBluetoothDevicesAndLogin())
+			// {
+			//     scene = 1;
+			// }
 
 
 		}
@@ -662,7 +677,16 @@ public class TuioDemo : Form, TuioListener
 			g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
 		}
-		int imgwidth = 90;
+		else if (scene == 3)
+		{
+			g.DrawImage(Image.FromFile("TUIOtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+		}
+		else if (scene == 4)
+		{
+            g.DrawImage(Image.FromFile("Gtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+        }
+
+        int imgwidth = 90;
 		int imgheight = 90;
 		int y = 325;
 		if (scene == 1 || scene == 2)
@@ -684,6 +708,55 @@ public class TuioDemo : Form, TuioListener
             {
                 g.DrawImage(Image.FromFile(START.selected_img), new Rectangle(new Point(START.x, START.y), new Size(START.width, START.height)));
             }
+			if (TUTORIAL.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(TUTORIAL.unselected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(TUTORIAL.selected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+            }
+        }
+
+		else if(scene ==3)
+		{
+            if (RIGHT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(RIGHT.unselected_img), new Rectangle(new Point(RIGHT.x, RIGHT.y), new Size(RIGHT.width, RIGHT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(RIGHT.selected_img), new Rectangle(new Point(RIGHT.x, RIGHT.y), new Size(RIGHT.width, RIGHT.height)));
+            }
+			if (EXIT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(EXIT.unselected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(EXIT.selected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
+        }
+		else if(scene ==4)
+		{
+            if (LEFT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(LEFT.unselected_img), new Rectangle(new Point(LEFT.x, LEFT.y), new Size(LEFT.width, LEFT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(LEFT.selected_img), new Rectangle(new Point(LEFT.x, LEFT.y), new Size(LEFT.width, LEFT.height)));
+            }
+
+            if (EXIT.type == "unselected")
+            {
+                g.DrawImage(Image.FromFile(EXIT.unselected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
+            else
+            {
+                g.DrawImage(Image.FromFile(EXIT.selected_img), new Rectangle(new Point(EXIT.x, EXIT.y), new Size(EXIT.width, EXIT.height)));
+            }
+
         }
 		
 		else if (scene == 1)
@@ -898,7 +971,7 @@ public class TuioDemo : Form, TuioListener
 									pot.WateringNo = 0;
 									pot.seed = null;
 									pot.phase = 1;
-									Score += 100;
+									Score += pot.income;
 								    displayLabel.Text=Score.ToString();
 						            break;
 						        }
@@ -913,6 +986,7 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "B";
+									pot.income = 100;
 									break;
 								}
 							}
@@ -926,6 +1000,7 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "W";
+									pot.income = 50;
 									break;
 								}
 							}
@@ -939,6 +1014,8 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "C";
+									pot.income = 120;
+
 									break;
 								}
 							}
@@ -952,7 +1029,9 @@ public class TuioDemo : Form, TuioListener
 							 {
 							     pot.State = "seeded";
 								    pot.seed = "P";
-									break;
+                                pot.income = 150;
+
+                                break;
 								}
 							}
 						}
@@ -965,7 +1044,9 @@ public class TuioDemo : Form, TuioListener
 								{
 									pot.State = "seeded";
 									pot.seed = "R";
-									break;
+									 pot.income = 200;
+
+                                break;
 								}
 							}
 						}
@@ -1024,10 +1105,86 @@ public class TuioDemo : Form, TuioListener
 							else
 							{
 								START.type = "unselected";
+							} 
+							if (Store_Intersect(ItemRECT, TUTORIAL.Rect))
+                            {
+								TUTORIAL.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+									scene = 3;
+                                }
+                                break;
+                            }
+							else
+							{
+								TUTORIAL.type = "unselected";
 							}
+                        
+                        }
+						if (scene ==3)
+						{
+                            Rectangle ItemRECT = new Rectangle(ox +size/2, oy - size, size+100, size+100);
+							g.FillRectangle(objBrush,ItemRECT);
 
-							
+                            if (Store_Intersect(ItemRECT, RIGHT.Rect))
+                            {
+                                RIGHT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 4;
+                                    timer.Stop();
+                                }
+                            }
+                            else
+                            {
+                                RIGHT.type = "unselected";
+                            }  
+							if (Store_Intersect(ItemRECT, EXIT.Rect))
+                            {
+                                EXIT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 0;
+                                    timer.Stop();
+                                }
+                                
+                            }
+                            else
+                            {
+                                EXIT.type = "unselected";
+                            }
+                        }	
 
+						if (scene ==4)
+						{
+                            Rectangle ItemRECT = new Rectangle(ox - size / 2, oy - size / 2, size+100, size+100);
+
+                            if (Store_Intersect(ItemRECT, LEFT.Rect))
+                            {
+                                LEFT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 3;
+                                    timer.Stop();
+                                }
+                            }
+                            else
+                            {
+                                LEFT.type = "unselected";
+                            }  
+							if (Store_Intersect(ItemRECT, EXIT.Rect))
+                            {
+                                EXIT.type = "selected";
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                {
+                                    scene = 0;
+                                    timer.Stop();
+                                }
+                            }
+                            else
+                            {
+                                EXIT.type = "unselected";
+                            }
                         }
 						if (scene == 1)
 						{
@@ -1131,32 +1288,32 @@ public class TuioDemo : Form, TuioListener
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg2.jpg");
                             break;
                         case 2:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "H1.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "H2.png");
 
 							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
 							break;
                         case 3:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "BEETROOT.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBEETROOT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 4:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WHEAT.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sWHEAT.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 5:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "carrot.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sCARROT.png");
 							
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 6:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "potato.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sPOTATO.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 7:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "berry.png");
+                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBERRY.png");
 
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break; 
