@@ -42,6 +42,7 @@ using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 using System.Security.Cryptography.X509Certificates;
 using System.Timers;
+using System.Linq;
 
 public class TuioDemo : Form, TuioListener
 {
@@ -94,15 +95,26 @@ public class TuioDemo : Form, TuioListener
 	{
 		public String name { get; set; }
 		public String address { get; set; }
+		public int score;
+		public List<String> unlockables { get; set; }
+		public List<String> states { get; set; }
+		public List<String> seeds {  get; set; }
+		public List<int> phases { get; set; }
 		public Device()
 		{
 			this.name = "";
 			this.address = "";
+			this.score = 0;
+			this.states = new List<String>();
+            this.seeds = new List<string>();
+            this.unlockables = new List<String>();
 		}
-		public Device(String name, String address)
+		public Device(String name, String address, int score, List<String> unlockables)
 		{
 			this.name = name;
 			this.address = address;
+			this.unlockables.Add(name);
+			this.score = score;
 		}
 	}
 	public class DeviceJson
@@ -365,6 +377,7 @@ public class TuioDemo : Form, TuioListener
 	public List<Pot> Pots = new List<Pot>();
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
+	public List<String> unlocked = new List<String>();
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
@@ -398,7 +411,7 @@ public class TuioDemo : Form, TuioListener
 	/// //////////
 	/// </summary>
 	private bool verbose;
-
+	private string currentUser; 
 	private Label displayLabel;
     private Label userLabel;
 	public int shownuser = 0;
@@ -431,6 +444,7 @@ public class TuioDemo : Form, TuioListener
 
 		int y = 325;
 		devices = getBluetoothDevicesAndLogin();
+		
 		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60);
 		Pots.Add(Pot1);
 		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45);
@@ -520,8 +534,23 @@ public class TuioDemo : Form, TuioListener
 
     private void Timer_Tick(object sender, EventArgs e)
     {
-        devices = getBluetoothDevicesAndLogin();
-
+		if (scene == 0)
+		{
+			devices = getBluetoothDevicesAndLogin();
+		}
+		if (scene == 1)
+		{
+			List<int> phases = new List<int>();
+			List<String> seeds = new List<String>();
+			List<String> states = new List<String>();
+			foreach (Pot pot in Pots)
+			{
+				phases.Add(pot.phase);
+				seeds.Add(pot.seed);
+				states.Add(pot.State);
+			}
+			mongoDbOps.UpdateDocument("users", currentUser, Score, unlocked, phases, states, seeds);
+		}
     }
 
 
@@ -604,10 +633,6 @@ public class TuioDemo : Form, TuioListener
 		g.Clear(Color.White);
 		if (scene == 0)
 		{
-
-			
-
-			
 			if (devices.Count > 0) { 
 
 				userLabel.Text = devices[shownuser].name;
@@ -615,7 +640,7 @@ public class TuioDemo : Form, TuioListener
 			}
 			else
 			{
-				userLabel.Text = "NOOOOOO";
+				userLabel.Text = "No devices detected";
 
             }
 
@@ -879,7 +904,7 @@ public class TuioDemo : Form, TuioListener
 						        }
 						    }
 						}
-						if (tobj.SymbolID == 3)
+						if (tobj.SymbolID == 3 && unlocked.Contains("B"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size , size);
 							foreach (var pot in Pots)
@@ -892,7 +917,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 4)
+						if (tobj.SymbolID == 4 && unlocked.Contains("W"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size , size );
 							foreach (var pot in Pots)
@@ -905,7 +930,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 5)
+						if (tobj.SymbolID == 5 && unlocked.Contains("C"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
@@ -918,7 +943,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 6)
+						if (tobj.SymbolID == 6 && unlocked.Contains("P"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
@@ -931,7 +956,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 7)
+						if (tobj.SymbolID == 7 && unlocked.Contains("R"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
@@ -979,10 +1004,20 @@ public class TuioDemo : Form, TuioListener
                             if (Store_Intersect(ItemRECT, START.Rect))
                             {
 								START.type = "selected";
-                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0)
                                 {
 									scene = 1;
-									timer.Stop();
+									currentUser = devices[shownuser].address;
+									Device device = new Device();
+									device = mongoDbOps.GetUserDevice("users", currentUser);
+									unlocked = device.unlockables;
+									Score = device.score;
+									for(int i=0;i<4;i++)
+									{
+										Pots[i].seed = device.seeds[i];
+                                        Pots[i].phase = device.phases[i];
+                                        Pots[i].State = device.states[i];
+                                    }
                                 }
                                 break;
                             }
