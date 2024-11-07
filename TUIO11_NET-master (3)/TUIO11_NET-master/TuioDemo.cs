@@ -55,11 +55,12 @@ public class TuioDemo : Form, TuioListener
 		public int y;
 		public int width;
 		public int height;
+		public int price;
 		public string selected_img;
 		public string unselected_img;
 		public string type;
 		public bool ispurchased=false;
-		public Store_Items(int x, int y, int width, int height, string selected, string unselected, string type)
+		public Store_Items(int x, int y, int width, int height, string selected, string unselected, string type,int price)
 		{
 			this.Rect = new Rectangle(x, y, width, height);
 			this.x = x;
@@ -69,6 +70,7 @@ public class TuioDemo : Form, TuioListener
 			this.unselected_img = unselected;
 			this.height = height;
 			this.type = type;
+			this.price = price;
 		}
 	}	
 	public class Button
@@ -96,11 +98,12 @@ public class TuioDemo : Form, TuioListener
 	{
 		public String name { get; set; }
 		public String address { get; set; }
-		public int score;
+		public Int32 score { get; set; }
 		public List<String> unlockables { get; set; }
 		public List<String> states { get; set; }
 		public List<String> seeds {  get; set; }
 		public List<int> phases { get; set; }
+		public string status { get; set; }
 		public Device()
 		{
 			this.name = "";
@@ -109,6 +112,7 @@ public class TuioDemo : Form, TuioListener
 			this.states = new List<String>();
             this.seeds = new List<string>();
             this.unlockables = new List<String>();
+			this.status = "guest";
 		}
 		public Device(String name, String address, int score, List<String> unlockables)
 		{
@@ -382,6 +386,7 @@ public class TuioDemo : Form, TuioListener
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
 	public List<String> unlocked = new List<String>();
+	
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
 
     public Button TUTORIAL = new Button(680, 700, 606, 99, "TUTORIAL.png", "HTUTORIAL.png");
@@ -411,6 +416,7 @@ public class TuioDemo : Form, TuioListener
 	private bool fullscreen;
 	public bool state1 = false;
 	int time = 0;
+	public string isAdmin;
 	/// <summary>
 	/// /////////////////
 	/// </summary>
@@ -467,17 +473,18 @@ public class TuioDemo : Form, TuioListener
         timer.Interval = 5000; 
         timer.Tick += Timer_Tick; 
         timer.Start();
+		
         //  g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("Bseed.png"), new Rectangle(new Point(600 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point(800 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("potato.png"), new Rectangle(new Point(1000 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("berry.png"), new Rectangle(new Point(1200 - 40, 500), new Size(111, 111)));
 
-        Store_Items Item1 = new Store_Items(360, 500, 111, 111, "Wseed.png", "HWseed.png", "W");
-		Store_Items Item2 = new Store_Items(560, 500, 111, 111, "Bseed.png", "HBseed.png", "B");
-		Store_Items Item3 = new Store_Items(760, 500, 111, 111, "carrot.png", "Hcarrot.png", "C");
-		Store_Items Item4 = new Store_Items(960, 500, 111, 111, "potato.png", "Hpotato.png", "P");
-		Store_Items Item5 = new Store_Items(1160, 500, 111, 111, "berry.png", "Hberry.png", "R");
+        Store_Items Item1 = new Store_Items(360, 500, 111, 111, "Wseed.png", "HWseed.png", "W",0);
+		Store_Items Item2 = new Store_Items(560, 500, 111, 111, "Bseed.png", "HBseed.png", "B",200);
+		Store_Items Item3 = new Store_Items(760, 500, 111, 111, "carrot.png", "Hcarrot.png", "C",150);
+		Store_Items Item4 = new Store_Items(960, 500, 111, 111, "potato.png", "Hpotato.png", "P",300);
+		Store_Items Item5 = new Store_Items(1160, 500, 111, 111, "berry.png", "Hberry.png", "R",200);
 		StoreItems.Add(Item1);
 		StoreItems.Add(Item2);
 		StoreItems.Add(Item3);
@@ -632,6 +639,7 @@ public class TuioDemo : Form, TuioListener
         // Getting the graphics object
         //getBluetoothDevicesAndUploadToDatabase();
 
+        displayLabel.Text = Score.ToString();
 
         time++;
 		if (small_shovel == null)
@@ -678,8 +686,10 @@ public class TuioDemo : Form, TuioListener
 			g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
 		}
+		
 		else if (scene == 3)
 		{
+
 			g.DrawImage(Image.FromFile("TUIOtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 		}
 		else if (scene == 4)
@@ -709,14 +719,17 @@ public class TuioDemo : Form, TuioListener
             {
                 g.DrawImage(Image.FromFile(START.selected_img), new Rectangle(new Point(START.x, START.y), new Size(START.width, START.height)));
             }
-			if (TUTORIAL.type == "unselected")
-            {
-                g.DrawImage(Image.FromFile(TUTORIAL.unselected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
-            }
-            else
-            {
-                g.DrawImage(Image.FromFile(TUTORIAL.selected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
-            }
+			if (isAdmin == "guest")
+			{
+				if (TUTORIAL.type == "unselected")
+				{
+					g.DrawImage(Image.FromFile(TUTORIAL.unselected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+				}
+				else
+				{
+					g.DrawImage(Image.FromFile(TUTORIAL.selected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+				}
+			}
         }
 
 		else if(scene ==3)
@@ -1074,6 +1087,11 @@ public class TuioDemo : Form, TuioListener
 									{
 
 										current_Item = StoreItem.type;
+										if(Score-StoreItem.price >= 0 && !unlocked.Contains(StoreItem.type)) {
+											Score = Score - StoreItem.price;
+											unlocked.Add(StoreItem.type);
+										}
+										
 									}
 									break;
 								}
@@ -1093,6 +1111,7 @@ public class TuioDemo : Form, TuioListener
 									device = mongoDbOps.GetUserDevice("users", currentUser);
 									unlocked = device.unlockables;
 									Score = device.score;
+									Console.WriteLine("                             " + Score);
 									for(int i=0;i<4;i++)
 									{
                                         if (device.seeds.Count > 0) { 
@@ -1143,19 +1162,22 @@ public class TuioDemo : Form, TuioListener
 							else
 							{
 								START.type = "unselected";
-							} 
-							if (Store_Intersect(ItemRECT, TUTORIAL.Rect))
-                            {
-								TUTORIAL.type = "selected";
-                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
-                                {
-									scene = 3;
-                                }
-                                break;
-                            }
-							else
+							}
+							if (isAdmin == "admin")
 							{
-								TUTORIAL.type = "unselected";
+								if (Store_Intersect(ItemRECT, TUTORIAL.Rect))
+								{
+									TUTORIAL.type = "selected";
+									if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+									{
+										scene = 3;
+									}
+									break;
+								}
+								else
+								{
+									TUTORIAL.type = "unselected";
+								}
 							}
                         
                         }
@@ -1293,6 +1315,10 @@ public class TuioDemo : Form, TuioListener
                                 userLabel.Text = devices[shownuser].name;
 
                             }
+                            currentUser = devices[shownuser].address;
+                            Device device = new Device();
+                            device = mongoDbOps.GetUserDevice("users", currentUser);
+							isAdmin = device.status;
                         }
                         if (tobj.SymbolID == 10)
                         {

@@ -36,7 +36,7 @@ namespace MongoDBOperations
             var filter = Builders<BsonDocument>.Filter.Eq("address", address);
 
             var update = Builders<BsonDocument>.Update
-                .Set("score", score)
+                .Set("score", new BsonInt32(score))
                 .Set("unlockables", new BsonArray(unlockables)) 
                 .Set("phases", new BsonArray(phases))           
                 .Set("states", new BsonArray(states))           
@@ -82,7 +82,8 @@ namespace MongoDBOperations
                 unlockables = document.Contains("unlockables") ? document["unlockables"].AsBsonArray.Select(u => u.AsString).ToList() : new List<string>(),
                 seeds = document.Contains("seeds") ? document["seeds"].AsBsonArray.Select(s => s.AsString).ToList() : new List<string>(),
                 states = document.Contains("states") ? document["states"].AsBsonArray.Select(s => s.AsString).ToList() : new List<string>(),
-                phases = document.Contains("phases") ? document["phases"].AsBsonArray.Select(p => p.AsInt32).ToList() : new List<int>()
+                phases = document.Contains("phases") ? document["phases"].AsBsonArray.Select(p => p.AsInt32).ToList() : new List<int>(),
+                status = document.Contains("status") ? document["status"].AsString : ""  
             };
 
             return device;
