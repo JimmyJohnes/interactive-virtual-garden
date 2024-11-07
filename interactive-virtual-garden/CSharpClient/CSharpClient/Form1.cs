@@ -13,7 +13,6 @@ using static CSharpClient.Form1;
 using System.Runtime.CompilerServices;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
-using MongoDBOperations;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using ZstdSharp.Unsafe;
@@ -23,27 +22,6 @@ namespace CSharpClient
 {
     public partial class Form1 : Form
     {
-        public class Device
-        {
-            public String name { get; set; }
-            public String address { get; set; }
-            public int score;
-            public List<String> unlockables { get; set; }
-            public Device()
-            {
-                this.name = "";
-                this.address = "";
-                this.score = 0;
-                this.unlockables = new List<String>();
-            }
-            public Device(String name, String address, int score, List<String> unlockables)
-            {
-                this.name = name;
-                this.address = address;
-                this.unlockables.Add(name);
-                this.score = score;
-            }
-        }
         public class DeviceJson
         {
             public List<Device> devices { get; set; }
@@ -126,80 +104,82 @@ namespace CSharpClient
             }
         }
 
-        public List<Device> getBluetoothDevicesAndLogin()
+            public List<Device> getBluetoothDevicesAndLogin()
+    {
+        List<Device> devices = new List<Device>();
+        try
         {
-            List<Device> devices = new List<Device>();
+
+            String ip = "127.0.0.1";
+            int port = 3000;
+            IPAddress ipAddr = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+            Socket sender = new Socket(ipAddr.AddressFamily,
+                      SocketType.Stream, ProtocolType.Tcp);
+
             try
             {
 
-                String ip = "127.0.0.1";
-                int port = 3000;
-                IPAddress ipAddr = IPAddress.Parse(ip);
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
-                Socket sender = new Socket(ipAddr.AddressFamily,
-                          SocketType.Stream, ProtocolType.Tcp);
+                sender.Connect(localEndPoint);
+                Console.WriteLine($"Socket connected to {ip}:{port}");
 
-                try
+                byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+                int byteSent = sender.Send(messageSent);
+
+                byte[] messageReceived = new byte[5024];
+
+                int byteRecv = sender.Receive(messageReceived);
+
+                String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+                DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
+                if (deviceJson?.devices != null)
                 {
-
-                    sender.Connect(localEndPoint);
-                    Console.WriteLine($"Socket connected to {ip}:{port}");
-
-                    byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
-                    int byteSent = sender.Send(messageSent);
-
-                    byte[] messageReceived = new byte[5024];
-
-                    int byteRecv = sender.Receive(messageReceived);
-
-                    String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-                    DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
-                    if (deviceJson?.devices != null)
-                    {
-                        foreach (Device device in deviceJson.devices)
-                        {
-                            Console.WriteLine("response:" + device.name + " " + device.address);
-                            if (mongoDbOps.DoesAddressExist("users", device.address))
-                            {
-                                Console.WriteLine($"Device with address {device.address} Logged in.");
-                                devices.Add(device);
-                            }
-                            else
-                            {
-                                var document = new BsonDocument
-                         {
-                                {"name",device.name },{ "address", device.address}
-                        };
-                                mongoDbOps.InsertDocument("users", document);
-                                Console.WriteLine($"Device with address {device.address} inserted.");
-                                Console.WriteLine($"Device with address {device.address} is not registered.");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No devices found in the JSON response.");
-                    }
-                    Console.WriteLine(deviceJson.devices.Count);
-                    Console.WriteLine("recieved");
                     foreach (Device device in deviceJson.devices)
                     {
-                        Console.WriteLine($"name:{device.name}, address: {device.address}");
+                        Console.WriteLine("response:" + device.name+" "+device.address);
+                        if (mongoDbOps.DoesAddressExist("users", device.address))
+                        {
+                            Console.WriteLine($"Device with address {device.address} Logged in.");
+                            devices.Add(device);
+                        }
+                        else
+                        {
+                            var document = new BsonDocument
+                         {
+								{"name",device.name },{ "address", device.address}
+                        };
+                            mongoDbOps.InsertDocument("users", document);
+                            Console.WriteLine($"Device with address {device.address} inserted.");
+                            Console.WriteLine($"Device with address {device.address} is not registered.");
+                        }
                     }
-
-                    sender.Shutdown(SocketShutdown.Both);
-                    sender.Close();
-                    return devices;
                 }
-                catch
+                else
                 {
-
+                    Console.WriteLine("No devices found in the JSON response.");
                 }
+                Console.WriteLine(deviceJson.devices.Count);
+                Console.WriteLine("recieved");
+                foreach (Device device in deviceJson.devices)
+                {
+                    Console.WriteLine($"name:{device.name}, address: {device.address}");
+                }
+
+                sender.Shutdown(SocketShutdown.Both);
+                sender.Close();
+                return devices;
+            }
+            catch
+            {
 
             }
-            catch { }
-            return devices;
+
         }
+        catch { }
+        return devices;
+    }
+
+
         public DeviceJson getBluetoothDevicesAndUploadToDatabase()
         {
 
@@ -331,7 +311,7 @@ namespace CSharpClient
             lastTime = currentTime;
             if (!await StreamAsync())
             {
-                Console.WriteLine("Failed to connect to server.");
+               // Console.WriteLine("Failed to connect to server.");
             }
             buffer();
             Manage();
@@ -433,8 +413,8 @@ namespace CSharpClient
                 case "Welcome":
                     switch (command)
                     {
-                        case "shop":
-                            mode = "";
+                        case "hoe":
+                            mode = "Farm";
                             break;
                         case "left":
                             Select(-1, devices.Count, ref Currentdevice);
@@ -559,7 +539,7 @@ namespace CSharpClient
         {
             if (stream == null)
             {
-                Console.WriteLine("Stream is not initialized.");
+               // Console.WriteLine("Stream is not initialized.");
                 return null;
             }
 
@@ -587,14 +567,7 @@ namespace CSharpClient
             string Hovered;
             foreach (var pot in PotList)
             {
-                if(i == CurrentPot)
-                {
-                    Hovered = "H";
-                }
-                else
-                {
-                    Hovered = "";
-                }
+                Hovered = (i == CurrentPot) ? "H" : "";
                 i++;
                 switch (pot.State)
                 {
@@ -722,7 +695,7 @@ namespace CSharpClient
 
                     if (devices.Count > 0)
                     {
-                        g.DrawString("Current Device: " + devices[Currentdevice].name, new Font("Arial", 20, FontStyle.Regular), Brushes.White, 200, 400);
+                        g.DrawString("Current Device: " + devices[Currentdevice].name, new Font("Arial", 40, FontStyle.Regular), Brushes.White, 200, 400);
                     }
 
                     break;
