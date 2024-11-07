@@ -76,7 +76,7 @@ def recognize_gesture(client_socket):
 
                 # Send recognition result to C# client
                 try:
-                    client_socket.send(f"Match: {match_name} (Score: {score:.2f})".encode('utf-8'))
+                    client_socket.send(f"{match_name}".encode('utf-8'))
                 except Exception as e:
                     print("Error sending data to C# client:", e)
                     break
