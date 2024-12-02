@@ -20,7 +20,7 @@ if len(unknown_encoding)<=0:
 
 unknown_encoding = unknown_encoding[0]
 
-results = face_recognition.compare_faces(encodings, unknown_encoding)
+results = face_recognition.compare_faces(encodings, unknown_encoding, tolerance=0.5)
 print(results)
 
 recognized = False
