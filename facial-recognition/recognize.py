@@ -16,7 +16,7 @@ def read_encodings(csv_dir: str):
 
 
 
-def regonize_face(image):
+def recogonize_face(image,encodings):
 
     image_locations = face_recognition.face_locations(image)
     unknown_encoding = face_recognition.face_encodings(image,image_locations)
@@ -38,4 +38,5 @@ def regonize_face(image):
 
 
 result, image = cam.capture_image()
-recognize_face(image)
+encodings = read_encodings("encodings/adham")
+recogonize_face(image,encodings)
