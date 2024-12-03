@@ -40,6 +40,7 @@ def recogonize_face(image,encodings)-> str:
 
 
 
-result, image = cam.capture_image()
-encodings = read_encodings("encodings/adham.csv")
-print(recogonize_face(image,encodings))
+if __name__ == "__main__":
+    result, image = cam.capture_image()
+    encodings = read_encodings("encodings/adham.csv")
+    print(recogonize_face(image,encodings))
