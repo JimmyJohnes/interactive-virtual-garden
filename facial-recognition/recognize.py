@@ -15,7 +15,6 @@ def read_encodings(csv_dir: str):
 
 
 def determine_whos_in_the_pic(comparison_results) -> bool:
-# TODO: Implement an algorithm to figure out who is in the picture
     acceptance_count = comparison_results.count(np.True_)
     if acceptance_count / len(comparison_results) >= 0.75:
         return True
@@ -29,7 +28,7 @@ def recogonize_face(image,encodings)-> str:
     image_locations = face_recognition.face_locations(image)
     unknown_encoding = face_recognition.face_encodings(image,image_locations)
     if len(unknown_encoding)<=0:
-        exit("can't find faces in provided picture")
+        return "can't find faces in provided picture"
 
     unknown_encoding = unknown_encoding[0]
 
@@ -42,5 +41,5 @@ def recogonize_face(image,encodings)-> str:
 
 
 result, image = cam.capture_image()
-encodings = read_encodings("encodings/adham")
-recogonize_face(image,encodings)
+encodings = read_encodings("encodings/adham.csv")
+print(recogonize_face(image,encodings))
