@@ -1,16 +1,22 @@
 import face_recognition
 import numpy as np
 import cam
+import os
 
 #TODO: Implement a way to dynamically figure the names of users
 
 def read_encodings(csv_dir: str):
-    encodings = []
-    with open(csv_dir, "r") as file:
-        encoded_strings = file.readlines()
-        for string in encoded_strings:
-            string = string.replace("\n","")
-            encodings.append(np.asarray(string.split(","),dtype=np.float64))
+    encodings = {}
+    for path, folders, files in os.walk(csv_dir):
+        # Open file
+        for filename in files:
+            name = filename.split(".")[0]
+            encodings[name] = []
+            with open(os.path.join(csv_dir, filename)) as file:
+                encoded_strings = file.readlines()
+                for string in encoded_strings:
+                    string = string.replace("\n","")
+                    encodings[name].append(np.asarray(string.split(","),dtype=np.float64))
     return encodings
 
 
@@ -32,15 +38,16 @@ def recogonize_face(image,encodings)-> str:
 
     unknown_encoding = unknown_encoding[0]
 
-    results = face_recognition.compare_faces(encodings, unknown_encoding, tolerance=0.5)
-    acceptance = determine_whos_in_the_pic(results)
-    if acceptance:
-        return "He's adham"
+    for name in encodings:
+        results = face_recognition.compare_faces(encodings[name], unknown_encoding, tolerance=0.5)
+        acceptance = determine_whos_in_the_pic(results)
+        if acceptance:
+            return f"He's {name}"
     return "can't identify the person in the picture"
 
 
 
 if __name__ == "__main__":
     result, image = cam.capture_image()
-    encodings = read_encodings("encodings/adham.csv")
+    encodings = read_encodings("encodings/")
     print(recogonize_face(image,encodings))
