@@ -9,7 +9,7 @@ def server():
             print("Waiting for a new connection...")
             c, addr = s.accept()
             _,image = cam.capture_image()
-            encodings = recognize.read_encodings("encodings/adham.csv")
+            encodings = recognize.read_encodings("encodings/")
             result = recognize.recogonize_face(image,encodings)
             c.sendall(result.encode())
             
