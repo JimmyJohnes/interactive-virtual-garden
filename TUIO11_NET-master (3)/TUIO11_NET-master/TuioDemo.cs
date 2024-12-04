@@ -130,6 +130,40 @@ public class TuioDemo : Form, TuioListener
 			this.devices = devices;
 		}
 	}
+	public String getFacialRecognition()
+	{
+
+            String ip = "127.0.0.1";
+            int port = 3001;
+            IPAddress ipAddr = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+            Socket sender = new Socket(ipAddr.AddressFamily,
+                      SocketType.Stream, ProtocolType.Tcp);
+            string Response = "";
+
+            try
+            {
+
+                sender.Connect(localEndPoint);
+                Console.WriteLine($"Socket connected to {ip}:{port}");
+
+                byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+                int byteSent = sender.Send(messageSent);
+
+                byte[] messageReceived = new byte[5024];
+
+                int byteRecv = sender.Receive(messageReceived);
+
+                Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+                Console.WriteLine(Response);
+                return Response;
+            }
+            catch
+            {
+
+            }
+            return Response;
+	}
     public List<Device> getBluetoothDevicesAndLogin()
     {
         List<Device> devices = new List<Device>();
@@ -394,6 +428,7 @@ public class TuioDemo : Form, TuioListener
 
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
+	public string identity;
 	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
@@ -554,6 +589,7 @@ public class TuioDemo : Form, TuioListener
     {
 		if (scene == 0)
 		{
+			identity = getFacialRecognition();
 			devices = getBluetoothDevicesAndLogin();
 		}
 		if (scene == 1)
@@ -669,14 +705,16 @@ public class TuioDemo : Form, TuioListener
 			}
 
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			// if (getBluetoothDevicesAndLogin())
-			// {
-			//     scene = 1;
-			// }
+            // if (getBluetoothDevicesAndLogin() &&
+            // (identity != "can't identify the person in the picture"|| identity != "can't find faces in provided picture")
+            // )
+            // {
+            //     scene = 1;
+            // }
 
 
-		}
-		else if (scene == 1)
+        }
+        else if (scene == 1)
 		{
             if (isNightTime == false) g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
             else g.DrawImage(Image.FromFile("NFARM.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));

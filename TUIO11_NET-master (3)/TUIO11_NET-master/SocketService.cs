@@ -39,13 +39,10 @@ namespace MyApp
           int byteRecv = sender.Receive(messageReceived);
 
           String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-          Console.WriteLine(Response);
           DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response)!;
-          Console.WriteLine(deviceJson.devices.Count);
-          foreach (Device device in deviceJson.devices)
-          {
-            Console.WriteLine($"name:{device.name}, address: {device.address}");
-          }
+
+
+
           sender.Shutdown(SocketShutdown.Both);
           sender.Close();
         }
