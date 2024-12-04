@@ -706,7 +706,7 @@ public class TuioDemo : Form, TuioListener
 
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
             // if (getBluetoothDevicesAndLogin() &&
-            // (identity != "can't identify the person in the picture"|| identity != "can't find faces in provided picture")
+            // 
             // )
             // {
             //     scene = 1;
@@ -1142,7 +1142,7 @@ public class TuioDemo : Form, TuioListener
                             if (Store_Intersect(ItemRECT, START.Rect))
                             {
 								START.type = "selected";
-                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0)
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0 && (identity != "can't identify the person in the picture" || identity != "can't find faces in provided picture"))
                                 {
 									currentUser = devices[shownuser].address;
 									Device device = new Device();
@@ -1153,14 +1153,11 @@ public class TuioDemo : Form, TuioListener
 									for(int i=0;i<4;i++)
 									{
                                         if (device.seeds.Count > 0) { 
-
                                             Pots[i].seed = device.seeds[i];
-											
 										}
 										else
 										{
 											Pots[i].seed = "";
-
                                         }
 
 										if (device.phases.Count > 0)
@@ -1342,7 +1339,8 @@ public class TuioDemo : Form, TuioListener
                     {
                         if (tobj.SymbolID == 9)
                         {
-							if (shownuser < 5)
+                            // (identity != "can't identify the person in the picture"|| identity != "can't find faces in provided picture")
+                            if (shownuser < 5)
 							{
 								shownuser = shownuser + 1;
 								userLabel.Text = devices[shownuser].name;
