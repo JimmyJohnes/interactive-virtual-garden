@@ -313,7 +313,7 @@ namespace CSharpClient
         }
         async void Tt_Tick(object sender, EventArgs e)
         {
-            long currentTime = stopwatch.ElapsedMilliseconds;
+            long currentTime = stopwatch.ElapsedMilliseconds;   
             deltaTime = (currentTime - lastTime) / 1000.0f;
             lastTime = currentTime;
             if (!await StreamAsync())
