@@ -42,6 +42,7 @@ using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 using System.Security.Cryptography.X509Certificates;
 using System.Timers;
+using System.Linq;
 
 public class TuioDemo : Form, TuioListener
 {
@@ -54,11 +55,12 @@ public class TuioDemo : Form, TuioListener
 		public int y;
 		public int width;
 		public int height;
+		public int price;
 		public string selected_img;
 		public string unselected_img;
 		public string type;
 		public bool ispurchased=false;
-		public Store_Items(int x, int y, int width, int height, string selected, string unselected, string type)
+		public Store_Items(int x, int y, int width, int height, string selected, string unselected, string type,int price)
 		{
 			this.Rect = new Rectangle(x, y, width, height);
 			this.x = x;
@@ -68,6 +70,7 @@ public class TuioDemo : Form, TuioListener
 			this.unselected_img = unselected;
 			this.height = height;
 			this.type = type;
+			this.price = price;
 		}
 	}	
 	public class Button
@@ -95,15 +98,28 @@ public class TuioDemo : Form, TuioListener
 	{
 		public String name { get; set; }
 		public String address { get; set; }
+		public Int32 score { get; set; }
+		public List<String> unlockables { get; set; }
+		public List<String> states { get; set; }
+		public List<String> seeds {  get; set; }
+		public List<int> phases { get; set; }
+		public string status { get; set; }
 		public Device()
 		{
 			this.name = "";
 			this.address = "";
+			this.score = 0;
+			this.states = new List<String>();
+            this.seeds = new List<string>();
+            this.unlockables = new List<String>();
+			this.status = "guest";
 		}
-		public Device(String name, String address)
+		public Device(String name, String address, int score, List<String> unlockables)
 		{
 			this.name = name;
 			this.address = address;
+			this.unlockables.Add(name);
+			this.score = score;
 		}
 	}
 	public class DeviceJson
@@ -113,6 +129,40 @@ public class TuioDemo : Form, TuioListener
 		{
 			this.devices = devices;
 		}
+	}
+	public String getFacialRecognition()
+	{
+
+            String ip = "127.0.0.1";
+            int port = 3001;
+            IPAddress ipAddr = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+            Socket sender = new Socket(ipAddr.AddressFamily,
+                      SocketType.Stream, ProtocolType.Tcp);
+            string Response = "";
+
+            try
+            {
+
+                sender.Connect(localEndPoint);
+                Console.WriteLine($"Socket connected to {ip}:{port}");
+
+                byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+                int byteSent = sender.Send(messageSent);
+
+                byte[] messageReceived = new byte[5024];
+
+                int byteRecv = sender.Receive(messageReceived);
+
+                Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+                Console.WriteLine(Response);
+                return Response;
+            }
+            catch
+            {
+
+            }
+            return Response;
 	}
     public List<Device> getBluetoothDevicesAndLogin()
     {
@@ -322,7 +372,7 @@ public class TuioDemo : Form, TuioListener
 
 	public class Pot
 	{
-		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position,int min_Y,int income, int phase = 1, string State = "initial" )
+		public Pot(string path_initial, string path_dug, int x, int y, int width, int height, string position,int min_Y,int income, int phase = 1, string State = "initial",string seed = "" )
 		{
 			this.path_initial = path_initial;
 			this.path_dug_version = path_dug;
@@ -336,6 +386,7 @@ public class TuioDemo : Form, TuioListener
 			this.phase = phase;
 			this.min_Y = min_Y;
 			this.income=income;
+			this.seed = seed;
 		}
 		public int min_Y;
 		public int income;
@@ -368,12 +419,15 @@ public class TuioDemo : Form, TuioListener
 	public List<Pot> Pots = new List<Pot>();
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
+	public List<String> unlocked = new List<String>();
+	
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
 
     public Button TUTORIAL = new Button(680, 700, 606, 99, "TUTORIAL.png", "HTUTORIAL.png");
 
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
+	public string identity;
 	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
@@ -395,7 +449,9 @@ public class TuioDemo : Form, TuioListener
 	public int Score;
 	public string current_Item = "W";
 	private bool fullscreen;
+	public bool state1 = false;
 	int time = 0;
+	public string isAdmin;
 	/// <summary>
 	/// /////////////////
 	/// </summary>
@@ -406,7 +462,7 @@ public class TuioDemo : Form, TuioListener
 	/// //////////
 	/// </summary>
 	private bool verbose;
-
+	private string currentUser; 
 	private Label displayLabel;
     private Label userLabel;
 	public int shownuser = 0;
@@ -439,6 +495,7 @@ public class TuioDemo : Form, TuioListener
 
 		int y = 325;
 		devices = getBluetoothDevicesAndLogin();
+		
 		Pot Pot1 = new Pot("S1.png", "P1.png", 6, 652, this.Width + 125, this.Height + 60, "L", this.Height + 60,0);
 		Pots.Add(Pot1);
 		Pot Pot2 = new Pot("S2.png", "P2.png", 548, 657, this.Width + 5, this.Height + 45, "LC", this.Height + 45,0);
@@ -451,17 +508,18 @@ public class TuioDemo : Form, TuioListener
         timer.Interval = 5000; 
         timer.Tick += Timer_Tick; 
         timer.Start();
+		
         //  g.DrawImage(Image.FromFile("Wseed.png"), new Rectangle(new Point(400 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("Bseed.png"), new Rectangle(new Point(600 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("carrot.png"), new Rectangle(new Point(800 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("potato.png"), new Rectangle(new Point(1000 - 40, 500), new Size(111, 111)));
         //  g.DrawImage(Image.FromFile("berry.png"), new Rectangle(new Point(1200 - 40, 500), new Size(111, 111)));
 
-        Store_Items Item1 = new Store_Items(360, 500, 111, 111, "Wseed.png", "HWseed.png", "W");
-		Store_Items Item2 = new Store_Items(560, 500, 111, 111, "Bseed.png", "HBseed.png", "B");
-		Store_Items Item3 = new Store_Items(760, 500, 111, 111, "carrot.png", "Hcarrot.png", "C");
-		Store_Items Item4 = new Store_Items(960, 500, 111, 111, "potato.png", "Hpotato.png", "P");
-		Store_Items Item5 = new Store_Items(1160, 500, 111, 111, "berry.png", "Hberry.png", "R");
+        Store_Items Item1 = new Store_Items(360, 500, 111, 111, "Wseed.png", "HWseed.png", "W",0);
+		Store_Items Item2 = new Store_Items(560, 500, 111, 111, "Bseed.png", "HBseed.png", "B",200);
+		Store_Items Item3 = new Store_Items(760, 500, 111, 111, "carrot.png", "Hcarrot.png", "C",150);
+		Store_Items Item4 = new Store_Items(960, 500, 111, 111, "potato.png", "Hpotato.png", "P",300);
+		Store_Items Item5 = new Store_Items(1160, 500, 111, 111, "berry.png", "Hberry.png", "R",200);
 		StoreItems.Add(Item1);
 		StoreItems.Add(Item2);
 		StoreItems.Add(Item3);
@@ -528,8 +586,24 @@ public class TuioDemo : Form, TuioListener
 
     private void Timer_Tick(object sender, EventArgs e)
     {
-        devices = getBluetoothDevicesAndLogin();
-
+		if (scene == 0)
+		{
+			identity = getFacialRecognition();
+			devices = getBluetoothDevicesAndLogin();
+		}
+		if (scene == 1)
+		{
+			List<int> phases = new List<int>();
+			List<String> seeds = new List<String>();
+			List<String> states = new List<String>();
+			foreach (Pot pot in Pots)
+			{
+				phases.Add(pot.phase);
+				seeds.Add(pot.seed);
+				states.Add(pot.State);
+			}
+			mongoDbOps.UpdateDocument("users", currentUser, Score, unlocked, phases, states, seeds);
+		}
     }
 
 
@@ -601,6 +675,7 @@ public class TuioDemo : Form, TuioListener
         // Getting the graphics object
         //getBluetoothDevicesAndUploadToDatabase();
 
+        displayLabel.Text = Score.ToString();
 
         time++;
 		if (small_shovel == null)
@@ -625,19 +700,21 @@ public class TuioDemo : Form, TuioListener
 			}
 			else
 			{
-				userLabel.Text = "NOOOOOO";
+				userLabel.Text = "No devices detected";
 
 			}
 
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			// if (getBluetoothDevicesAndLogin())
-			// {
-			//     scene = 1;
-			// }
+            // if (getBluetoothDevicesAndLogin() &&
+            // (identity != "can't identify the person in the picture"|| identity != "can't find faces in provided picture")
+            // )
+            // {
+            //     scene = 1;
+            // }
 
 
-		}
-		else if (scene == 1)
+        }
+        else if (scene == 1)
 		{
 			g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
@@ -647,8 +724,10 @@ public class TuioDemo : Form, TuioListener
 			g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
 		}
+		
 		else if (scene == 3)
 		{
+
 			g.DrawImage(Image.FromFile("TUIOtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 		}
 		else if (scene == 4)
@@ -678,14 +757,17 @@ public class TuioDemo : Form, TuioListener
             {
                 g.DrawImage(Image.FromFile(START.selected_img), new Rectangle(new Point(START.x, START.y), new Size(START.width, START.height)));
             }
-			if (TUTORIAL.type == "unselected")
-            {
-                g.DrawImage(Image.FromFile(TUTORIAL.unselected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
-            }
-            else
-            {
-                g.DrawImage(Image.FromFile(TUTORIAL.selected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
-            }
+			if (isAdmin == "guest")
+			{
+				if (TUTORIAL.type == "unselected")
+				{
+					g.DrawImage(Image.FromFile(TUTORIAL.unselected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+				}
+				else
+				{
+					g.DrawImage(Image.FromFile(TUTORIAL.selected_img), new Rectangle(new Point(TUTORIAL.x, TUTORIAL.y), new Size(TUTORIAL.width, TUTORIAL.height)));
+				}
+			}
         }
 
 		else if(scene ==3)
@@ -807,7 +889,7 @@ public class TuioDemo : Form, TuioListener
                                 dest = new Rectangle(pot.x, pot.y - i, pot.width, pot.height + i);
                                 g.DrawImage(img, dest, src, GraphicsUnit.Pixel);
 							}
-							if (pot.WateringNo <= 40 && pot.WateringNo >= 30)
+							if ( pot.WateringNo >= 30)
 							{
 								pot.phase = 4;
                                 img = new Bitmap("P" + pot.seed + pot.position + pot.phase + ".png");
@@ -947,7 +1029,7 @@ public class TuioDemo : Form, TuioListener
 						        }
 						    }
 						}
-						if (tobj.SymbolID == 3)
+						if (tobj.SymbolID == 3 && unlocked.Contains("B"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size , size);
 							foreach (var pot in Pots)
@@ -975,7 +1057,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 5)
+						if (tobj.SymbolID == 5 && unlocked.Contains("C"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
@@ -990,7 +1072,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 6)
+						if (tobj.SymbolID == 6 && unlocked.Contains("P"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
@@ -1005,7 +1087,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-						if (tobj.SymbolID == 7)
+						if (tobj.SymbolID == 7 && unlocked.Contains("R"))
 						{
 							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 							foreach (var pot in Pots)
@@ -1020,7 +1102,7 @@ public class TuioDemo : Form, TuioListener
 								}
 							}
 						}
-					if (tobj.SymbolID==8)
+					if (tobj.SymbolID == 8)
 					{
 						if (scene == 2)
 						{
@@ -1043,6 +1125,11 @@ public class TuioDemo : Form, TuioListener
 									{
 
 										current_Item = StoreItem.type;
+										if(Score-StoreItem.price >= 0 && !unlocked.Contains(StoreItem.type)) {
+											Score = Score - StoreItem.price;
+											unlocked.Add(StoreItem.type);
+										}
+										
 									}
 									break;
 								}
@@ -1055,29 +1142,80 @@ public class TuioDemo : Form, TuioListener
                             if (Store_Intersect(ItemRECT, START.Rect))
                             {
 								START.type = "selected";
-                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0)
                                 {
-									scene = 1;
-									timer.Stop();
+									currentUser = devices[shownuser].address;
+									Device device = new Device();
+									device = mongoDbOps.GetUserDevice("users", currentUser);
+									unlocked = device.unlockables;
+									Score = device.score;
+									Console.WriteLine("                             " + Score);
+									for(int i=0;i<4;i++)
+									{
+                                        if (device.seeds.Count > 0) { 
+
+                                            Pots[i].seed = device.seeds[i];
+											
+										}
+										else
+										{
+											Pots[i].seed = "";
+
+                                        }
+
+										if (device.phases.Count > 0)
+										{
+											Pots[i].phase = device.phases[i];
+                                            if (device.phases[i] == 2)
+                                            {
+												Pots[i].WateringNo = 10;
+                                            }
+                                            if (device.phases[i] == 3)
+                                            {
+                                                Pots[i].WateringNo = 20;
+                                            }
+                                            if (device.phases[i] == 3)
+                                            {
+                                                Pots[i].WateringNo = 30;
+                                            }
+                                        }
+										else
+										{
+											Pots[i].phase = 1;
+										}
+
+										if (device.states.Count > 0)
+										{
+											Pots[i].State = device.states[i];
+										}
+										else
+										{
+											Pots[i].State = "initial";
+										}
+                                    }
+                                    scene = 1;
                                 }
                                 break;
                             }
 							else
 							{
 								START.type = "unselected";
-							} 
-							if (Store_Intersect(ItemRECT, TUTORIAL.Rect))
-                            {
-								TUTORIAL.type = "selected";
-                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
-                                {
-									scene = 3;
-                                }
-                                break;
-                            }
-							else
+							}
+							if (isAdmin == "admin")
 							{
-								TUTORIAL.type = "unselected";
+								if (Store_Intersect(ItemRECT, TUTORIAL.Rect))
+								{
+									TUTORIAL.type = "selected";
+									if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
+									{
+										scene = 3;
+									}
+									break;
+								}
+								else
+								{
+									TUTORIAL.type = "unselected";
+								}
 							}
                         
                         }
@@ -1092,7 +1230,6 @@ public class TuioDemo : Form, TuioListener
                                 if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
                                 {
                                     scene = 4;
-                                    timer.Stop();
                                 }
                             }
                             else
@@ -1105,7 +1242,6 @@ public class TuioDemo : Form, TuioListener
                                 if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
                                 {
                                     scene = 0;
-                                    timer.Stop();
                                 }
                                 
                             }
@@ -1125,7 +1261,6 @@ public class TuioDemo : Form, TuioListener
                                 if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
                                 {
                                     scene = 3;
-                                    timer.Stop();
                                 }
                             }
                             else
@@ -1138,7 +1273,6 @@ public class TuioDemo : Form, TuioListener
                                 if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270)
                                 {
                                     scene = 0;
-                                    timer.Stop();
                                 }
                             }
                             else
@@ -1158,8 +1292,8 @@ public class TuioDemo : Form, TuioListener
 									scene --;
 									if(scene == 0)
 									{
-										timer.Start();
-									}
+                                        currentUser = "";
+                                    }
                                 }
                                 break;
                             }
@@ -1208,7 +1342,7 @@ public class TuioDemo : Form, TuioListener
                     {
                         if (tobj.SymbolID == 9)
                         {
-							if (shownuser < devices.Count - 1)
+							if (shownuser < 5)
 							{
 								shownuser = shownuser + 1;
 								userLabel.Text = devices[shownuser].name;
@@ -1219,6 +1353,10 @@ public class TuioDemo : Form, TuioListener
                                 userLabel.Text = devices[shownuser].name;
 
                             }
+                            currentUser = devices[shownuser].address;
+                            Device device = new Device();
+                            device = mongoDbOps.GetUserDevice("users", currentUser);
+							isAdmin = device.status;
                         }
                         if (tobj.SymbolID == 10)
                         {
@@ -1235,46 +1373,67 @@ public class TuioDemo : Form, TuioListener
                             }
                         }
                     }
-                    switch (tobj.SymbolID)
-                    {
-                        case 0:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "SHOVEL.png");
-							
-                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg1.jpg");
-                            break;
-                        case 1:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "WATER.png");
+					switch (tobj.SymbolID)
+					{
+						case 0:
+							objectImagePath = Path.Combine(Environment.CurrentDirectory, "SHOVEL.png");
 
-                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg2.jpg");
-                            break;
-                        case 2:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "H2.png");
+							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg1.jpg");
+							break;
+						case 1:
+							objectImagePath = Path.Combine(Environment.CurrentDirectory, "WATER.png");
+
+							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg2.jpg");
+							break;
+						case 2:
+							objectImagePath = Path.Combine(Environment.CurrentDirectory, "H2.png");
 
 							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
 							break;
-                        case 3:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBEETROOT.png");
+						case 3:
+							if (unlocked.Contains("B"))
+							{ objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBEETROOT.png"); }
+							else {
+								goto default;
+							}
+							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+							break;
+						case 4:
+							objectImagePath = Path.Combine(Environment.CurrentDirectory, "sWHEAT.png");
 
-                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
-                            break;
-                        case 4:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sWHEAT.png");
-
-                            //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
-                            break;
-                        case 5:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sCARROT.png");
-							
+							//backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
+							break;
+						case 5:
+							if (unlocked.Contains("C"))
+							{
+								objectImagePath = Path.Combine(Environment.CurrentDirectory, "sCARROT.png");
+							}
+							else
+							{
+								goto default;
+							}
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 6:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sPOTATO.png");
-
+							if (unlocked.Contains("P"))
+							{
+								objectImagePath = Path.Combine(Environment.CurrentDirectory, "sPOTATO.png");
+							}
+							else
+							{
+								goto default;
+							}
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break;
                         case 7:
-                            objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBERRY.png");
-
+							if (unlocked.Contains("R"))
+							{
+								objectImagePath = Path.Combine(Environment.CurrentDirectory, "sBERRY.png");
+							}
+							else
+							{
+								goto default;
+							}
                             //backgroundImagePath = Path.Combine(Environment.CurrentDirectory, "bg3.jpg");
                             break; 
 						case 8:

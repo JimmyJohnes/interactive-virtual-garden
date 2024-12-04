@@ -26,7 +26,7 @@ def load_templates(filename="templates.pkl"):
         return []
 
 # Function to start a socket server for communication with the C# application
-def start_socket_server(host='localhost', port=12345):
+def start_socket_server(host='localhost', port= 5000):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(1)
@@ -76,7 +76,7 @@ def recognize_gesture(client_socket):
 
                 # Send recognition result to C# client
                 try:
-                    client_socket.send(f"Match: {match_name} (Score: {score:.2f})".encode('utf-8'))
+                    client_socket.send(f"{match_name}".encode('utf-8'))
                 except Exception as e:
                     print("Error sending data to C# client:", e)
                     break
