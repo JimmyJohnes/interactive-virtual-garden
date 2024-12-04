@@ -419,7 +419,8 @@ public class TuioDemo : Form, TuioListener
 	public List<Pot> Pots = new List<Pot>();
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
-	public List<String> unlocked = new List<String>();
+	public bool isNightTime;
+    public List<String> unlocked = new List<String>();
 	
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
 
@@ -672,9 +673,8 @@ public class TuioDemo : Form, TuioListener
 
 	protected override void OnPaintBackground(PaintEventArgs pevent)
 	{
-        // Getting the graphics object
-        //getBluetoothDevicesAndUploadToDatabase();
-
+        
+        isNightTime = DateTime.Now.Hour >= 18 || DateTime.Now.Hour < 8;
         displayLabel.Text = Score.ToString();
 
         time++;
@@ -716,10 +716,10 @@ public class TuioDemo : Form, TuioListener
         }
         else if (scene == 1)
 		{
-			g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
-
-		}
-		else if (scene == 2)
+            if (isNightTime == false) g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+            else g.DrawImage(Image.FromFile("NFARM.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+        }
+        else if (scene == 2)
 		{
 			g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
