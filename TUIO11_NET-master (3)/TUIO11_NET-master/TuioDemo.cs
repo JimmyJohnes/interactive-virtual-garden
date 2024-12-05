@@ -130,7 +130,7 @@ public class TuioDemo : Form, TuioListener
 			this.devices = devices;
 		}
 	}
-	public String getFacialRecognition()
+	public FaceProperties getFaceProperties()
 	{
 
             String ip = "127.0.0.1";
@@ -155,8 +155,8 @@ public class TuioDemo : Form, TuioListener
                 int byteRecv = sender.Receive(messageReceived);
 
                 Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-                Console.WriteLine(Response);
-                return Response;
+                FaceProperties faceProperties = JsonSerializer.Deserialize<FaceProperties>(Response);
+                return faceProperties;
             }
             catch
             {
@@ -429,6 +429,7 @@ public class TuioDemo : Form, TuioListener
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
 	public string identity;
+	public string emotion;
 	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
@@ -589,7 +590,9 @@ public class TuioDemo : Form, TuioListener
     {
 		if (scene == 0)
 		{
-			identity = getFacialRecognition();
+			FaceProperties faceProperties = getFaceProperties();
+			identity = faceProperties.identity;
+			emotion = faceProperties.emotion;
 			devices = getBluetoothDevicesAndLogin();
 		}
 		if (scene == 1)
@@ -1571,3 +1574,8 @@ public class TuioDemo : Form, TuioListener
 			Application.Run(app);
 		}
 	}
+// TODO: move this class to a separate folder
+public class FaceProperties{
+	public string identity {get; set;}
+	public string emotion {get; set;}
+}
