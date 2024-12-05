@@ -138,9 +138,10 @@ public class TuioDemo : Form, TuioListener
             IPAddress ipAddr = IPAddress.Parse(ip);
             IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
             Socket sender = new Socket(ipAddr.AddressFamily,
-                      SocketType.Stream, ProtocolType.Tcp);
+			SocketType.Stream, ProtocolType.Tcp);
             string Response = "";
-	
+			FaceProperties faceProperties = new FaceProperties();
+
             try
             {
 	
@@ -155,14 +156,14 @@ public class TuioDemo : Form, TuioListener
                 int byteRecv = sender.Receive(messageReceived);
 	
                 Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-                FaceProperties faceProperties = JsonSerializer.Deserialize<FaceProperties>(Response);
+                faceProperties = JsonSerializer.Deserialize<FaceProperties>(Response);
                 return faceProperties;
             }
             catch
             {
 	
             }
-            return Response;
+            return faceProperties;
 	}
     public List<Device> getBluetoothDevicesAndLogin()
     {
