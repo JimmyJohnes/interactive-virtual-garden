@@ -41,7 +41,7 @@ def recogonize_face(image,encodings)-> str:
         results = face_recognition.compare_faces(encodings[name], unknown_encoding, tolerance=0.5)
         acceptance = determine_whos_in_the_pic(results)
         if acceptance:
-            return f"He's {name}"
+            return f"{name}"
     return "can't identify the person in the picture"
 
 
