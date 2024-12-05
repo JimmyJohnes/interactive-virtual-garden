@@ -130,7 +130,7 @@ public class TuioDemo : Form, TuioListener
 			this.devices = devices;
 		}
 	}
-	public String getFacialRecognition()
+	public FaceProperties getFaceProperties()
 	{
 
             String ip = "127.0.0.1";
@@ -155,8 +155,8 @@ public class TuioDemo : Form, TuioListener
                 int byteRecv = sender.Receive(messageReceived);
 
                 Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-                Console.WriteLine(Response);
-                return Response;
+                FaceProperties faceProperties = JsonSerializer.Deserialize<FaceProperties>(Response);
+                return faceProperties;
             }
             catch
             {
@@ -429,6 +429,7 @@ public class TuioDemo : Form, TuioListener
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
 	public string identity;
+	public string emotion;
 	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
@@ -589,7 +590,9 @@ public class TuioDemo : Form, TuioListener
     {
 		if (scene == 0)
 		{
-			identity = getFacialRecognition();
+			FaceProperties faceProperties = getFaceProperties();
+			identity = faceProperties.identity;
+			emotion = faceProperties.emotion;
 			devices = getBluetoothDevicesAndLogin();
 		}
 		if (scene == 1)
@@ -706,7 +709,7 @@ public class TuioDemo : Form, TuioListener
 
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
             // if (getBluetoothDevicesAndLogin() &&
-            // (identity != "can't identify the person in the picture"|| identity != "can't find faces in provided picture")
+            // 
             // )
             // {
             //     scene = 1;
@@ -1142,7 +1145,7 @@ public class TuioDemo : Form, TuioListener
                             if (Store_Intersect(ItemRECT, START.Rect))
                             {
 								START.type = "selected";
-                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0)
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0 && (identity != "can't identify the person in the picture" || identity != "can't find faces in provided picture"))
                                 {
 									currentUser = devices[shownuser].address;
 									Device device = new Device();
@@ -1153,14 +1156,11 @@ public class TuioDemo : Form, TuioListener
 									for(int i=0;i<4;i++)
 									{
                                         if (device.seeds.Count > 0) { 
-
                                             Pots[i].seed = device.seeds[i];
-											
 										}
 										else
 										{
 											Pots[i].seed = "";
-
                                         }
 
 										if (device.phases.Count > 0)
@@ -1342,7 +1342,8 @@ public class TuioDemo : Form, TuioListener
                     {
                         if (tobj.SymbolID == 9)
                         {
-							if (shownuser < 5)
+                            // (identity != "can't identify the person in the picture"|| identity != "can't find faces in provided picture")
+                            if (shownuser < 5)
 							{
 								shownuser = shownuser + 1;
 								userLabel.Text = devices[shownuser].name;
@@ -1573,3 +1574,8 @@ public class TuioDemo : Form, TuioListener
 			Application.Run(app);
 		}
 	}
+// TODO: move this class to a separate folder
+public class FaceProperties{
+	public string identity {get; set;}
+	public string emotion {get; set;}
+}

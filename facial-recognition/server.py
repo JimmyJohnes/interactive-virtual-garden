@@ -1,7 +1,22 @@
 import socket
+import threading
 import asyncio
 import cam
 import recognize
+import emotion
+from thread_with_return_value import *
+
+
+def exec_face_recognition(image):
+    encodings = recognize.read_encodings("encodings/")
+    result = recognize.recogonize_face(image,encodings)
+    return result
+
+def exec_emotion_detection(image):
+    result = emotion.detect_emotion(image)
+    return result
+
+
 
 def server():
     try:
@@ -9,9 +24,19 @@ def server():
             print("Waiting for a new connection...")
             c, addr = s.accept()
             _,image = cam.capture_image()
-            encodings = recognize.read_encodings("encodings/")
-            result = recognize.recogonize_face(image,encodings)
-            c.sendall(result.encode())
+            face_recognition_thread = ThreadWithReutrn(target=exec_face_recognition, args=(image,))
+            emotion_detection_thread = ThreadWithReutrn(target=exec_emotion_detection, args=(image,))
+            face_recognition_thread.start()
+            emotion_detection_thread.start()
+            detected_face = face_recognition_thread.join()
+            detected_emotion = emotion_detection_thread.join()
+
+            face_properties = {
+                "identity": detected_face,
+                "emotion": detected_emotion
+            }
+            
+            c.sendall(json.dumps(face_properties).encode())
             
     except KeyboardInterrupt:
         print("Stopped Server: KeyboardInterrupt")
