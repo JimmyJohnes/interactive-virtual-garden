@@ -3,11 +3,11 @@ from deepface import DeepFace
 import json
 
 
-img_path = '/home/user/interactive-virtual-garden/image.jpg'
+# TODO: detect emotion using webcam
+img_path = ''
 # read image
 img = cv2.imread(img_path)
 
-cv2_imshow(img)
 
 # Detect emotion
 required_outputs =  ['emotion']
