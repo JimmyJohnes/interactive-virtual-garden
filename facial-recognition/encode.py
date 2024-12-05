@@ -1,8 +1,16 @@
 import face_recognition
-mypics = ["/home/ijimmyi/Downloads/WhatsApp Image 2024-08-01 at 3.28.11 PM.jpeg", "/home/ijimmyi/Downloads/WhatsApp Image 2024-10-12 at 8.12.38 PM.jpeg", "/home/ijimmyi/Downloads/WhatsApp Image 2024-01-23 at 9.14.15 AM.jpeg"]
-encodings = [face_recognition.face_encodings(face_recognition.load_image_file(mypic))[0] for mypic in mypics]
+import os
 
-with open("encodings/adham.csv","w") as file:
+name = input("name of person: ")
+pic_dir = input("directory of images: ")
+encodings = []
+for path, folders, files in os.walk(pic_dir):
+    # Open file
+    for filename in files:
+        with open(os.path.join(pic_dir, filename)) as pic:
+            encodings.append(face_recognition.face_encodings(face_recognition.load_image_file(pic))[0])
+
+with open(f"encodings/{name}.csv","w") as file:
     for encoding in encodings:
         string = [str(val) for val in encoding.tolist()]
         file.write(",".join(string))

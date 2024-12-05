@@ -130,6 +130,40 @@ public class TuioDemo : Form, TuioListener
 			this.devices = devices;
 		}
 	}
+	public String getFacialRecognition()
+	{
+
+            String ip = "127.0.0.1";
+            int port = 3001;
+            IPAddress ipAddr = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+            Socket sender = new Socket(ipAddr.AddressFamily,
+                      SocketType.Stream, ProtocolType.Tcp);
+            string Response = "";
+
+            try
+            {
+
+                sender.Connect(localEndPoint);
+                Console.WriteLine($"Socket connected to {ip}:{port}");
+
+                byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+                int byteSent = sender.Send(messageSent);
+
+                byte[] messageReceived = new byte[5024];
+
+                int byteRecv = sender.Receive(messageReceived);
+
+                Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+                Console.WriteLine(Response);
+                return Response;
+            }
+            catch
+            {
+
+            }
+            return Response;
+	}
     public List<Device> getBluetoothDevicesAndLogin()
     {
         List<Device> devices = new List<Device>();
@@ -385,7 +419,8 @@ public class TuioDemo : Form, TuioListener
 	public List<Pot> Pots = new List<Pot>();
 	public List<Store_Items> StoreItems = new List<Store_Items>();
 	public List<Button> Buttons = new List<Button>();
-	public List<String> unlocked = new List<String>();
+	public bool isNightTime;
+    public List<String> unlocked = new List<String>();
 	
     public Button START = new Button(680, 500, 606, 99, "START.png", "HSTART.png");
 
@@ -393,6 +428,7 @@ public class TuioDemo : Form, TuioListener
 
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
+	public string identity;
 	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
     public Button RETURN2 = new Button(30, 70, 273, 99, "RETURN.png", "HRETURN.png");
@@ -553,6 +589,7 @@ public class TuioDemo : Form, TuioListener
     {
 		if (scene == 0)
 		{
+			identity = getFacialRecognition();
 			devices = getBluetoothDevicesAndLogin();
 		}
 		if (scene == 1)
@@ -636,9 +673,8 @@ public class TuioDemo : Form, TuioListener
 
 	protected override void OnPaintBackground(PaintEventArgs pevent)
 	{
-        // Getting the graphics object
-        //getBluetoothDevicesAndUploadToDatabase();
-
+        
+        isNightTime = DateTime.Now.Hour >= 18 || DateTime.Now.Hour < 8;
         displayLabel.Text = Score.ToString();
 
         time++;
@@ -669,19 +705,21 @@ public class TuioDemo : Form, TuioListener
 			}
 
 			g.DrawImage(Image.FromFile("FARMCRAFT2.png"), new Rectangle(new Point(0, 0), new Size(width, height)));
-			// if (getBluetoothDevicesAndLogin())
-			// {
-			//     scene = 1;
-			// }
+            // if (getBluetoothDevicesAndLogin() &&
+            // 
+            // )
+            // {
+            //     scene = 1;
+            // }
 
 
-		}
-		else if (scene == 1)
+        }
+        else if (scene == 1)
 		{
-			g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
-
-		}
-		else if (scene == 2)
+            if (isNightTime == false) g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+            else g.DrawImage(Image.FromFile("NFARM.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+        }
+        else if (scene == 2)
 		{
 			g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
@@ -1104,7 +1142,7 @@ public class TuioDemo : Form, TuioListener
                             if (Store_Intersect(ItemRECT, START.Rect))
                             {
 								START.type = "selected";
-                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0)
+                                if (tobj.AngleDegrees > 30 && tobj.AngleDegrees < 270 && devices.Count > 0 && (identity != "can't identify the person in the picture" || identity != "can't find faces in provided picture"))
                                 {
 									currentUser = devices[shownuser].address;
 									Device device = new Device();
@@ -1115,14 +1153,11 @@ public class TuioDemo : Form, TuioListener
 									for(int i=0;i<4;i++)
 									{
                                         if (device.seeds.Count > 0) { 
-
                                             Pots[i].seed = device.seeds[i];
-											
 										}
 										else
 										{
 											Pots[i].seed = "";
-
                                         }
 
 										if (device.phases.Count > 0)
@@ -1304,7 +1339,8 @@ public class TuioDemo : Form, TuioListener
                     {
                         if (tobj.SymbolID == 9)
                         {
-							if (shownuser < 5)
+                            // (identity != "can't identify the person in the picture"|| identity != "can't find faces in provided picture")
+                            if (shownuser < 5)
 							{
 								shownuser = shownuser + 1;
 								userLabel.Text = devices[shownuser].name;
