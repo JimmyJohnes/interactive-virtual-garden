@@ -30,8 +30,13 @@ def server():
             emotion_detection_thread.start()
             detected_face = face_recognition_thread.join()
             detected_emotion = emotion_detection_thread.join()
+
+            face_properties = {
+                "identity": detected_face,
+                "emotion": detected_emotion
+            }
             
-            c.sendall(result.encode())
+            c.sendall(json.dumps(face_properties).encode())
             
     except KeyboardInterrupt:
         print("Stopped Server: KeyboardInterrupt")
