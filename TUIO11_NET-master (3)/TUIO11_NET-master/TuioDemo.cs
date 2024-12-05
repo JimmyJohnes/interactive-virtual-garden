@@ -132,7 +132,7 @@ public class TuioDemo : Form, TuioListener
 	}
 	public FaceProperties getFaceProperties()
 	{
-
+	
             String ip = "127.0.0.1";
             int port = 3001;
             IPAddress ipAddr = IPAddress.Parse(ip);
@@ -140,27 +140,27 @@ public class TuioDemo : Form, TuioListener
             Socket sender = new Socket(ipAddr.AddressFamily,
                       SocketType.Stream, ProtocolType.Tcp);
             string Response = "";
-
+	
             try
             {
-
+	
                 sender.Connect(localEndPoint);
                 Console.WriteLine($"Socket connected to {ip}:{port}");
-
+	
                 byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
                 int byteSent = sender.Send(messageSent);
-
+	
                 byte[] messageReceived = new byte[5024];
-
+	
                 int byteRecv = sender.Receive(messageReceived);
-
+	
                 Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
                 FaceProperties faceProperties = JsonSerializer.Deserialize<FaceProperties>(Response);
                 return faceProperties;
             }
             catch
             {
-
+	
             }
             return Response;
 	}
@@ -331,9 +331,49 @@ public class TuioDemo : Form, TuioListener
 			return null;
 		}
 	}
-	//string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-	private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-	public int scene = 0;
+	/// gets the presets for admin dashboard
+    public List<string> GetPresetTasks(int presetNumber)
+    {
+        switch (presetNumber)
+        {
+            case 1:
+                return new List<string> { "Water Plants", "Plant Seeds", "Harvest Crops" };
+            case 2:
+                return new List<string> { "Remove Weeds", "Fertilize Soil", "Clean Tools" };
+            case 3:
+                return new List<string> { "Prune Trees", "Build Fences", "Inspect Equipment" };
+            default:
+                return new List<string> { "No tasks assigned." };
+        }
+    }
+	// draws the preset rectanges on Admin dashboard
+    public void DrawPresetTasks(Graphics g, int presetNumber, int xOffset, int yOffset)
+    {
+        var tasks = GetPresetTasks(presetNumber); // Retrieve tasks for the preset
+        int rectWidth = 400; // Width of each task rectangle
+        int rectHeight = 80; // Height of each task rectangle
+        int spacing = 20; // Spacing between rectangles
+
+        // Draw the header for the preset
+        g.DrawString($"Preset {presetNumber}", new Font("Arial", 24, FontStyle.Bold), Brushes.Black, xOffset, yOffset - 50);
+
+        foreach (var task in tasks)
+        {
+            // Draw the rectangle
+            g.FillRectangle(Brushes.LightGray, xOffset, yOffset, rectWidth, rectHeight);
+            g.DrawRectangle(Pens.Black, xOffset, yOffset, rectWidth, rectHeight);
+
+            // Draw the task name inside the rectangle
+            g.DrawString(task, new Font("Arial", 16), Brushes.Black, xOffset + 10, yOffset + 25);
+
+            // Move to the next rectangle position
+            yOffset += rectHeight + spacing;
+        }
+    }
+
+    //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+    private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
+	public int scene = 5;
 
 	public Bitmap small_shovel;
 	public Bitmap objectImage;
@@ -349,7 +389,14 @@ public class TuioDemo : Form, TuioListener
 		// Call the InsertDocument method to add the document to the "users" collection
 		mongoDbOps.InsertDocument("users", document);
 	}
-	public class Villager
+	// should assign tasks to user from the admin dashboard but the update not working
+    //public void AssignPresetToUser(string userAddress, int presetNumber)
+    //{
+    //    // Save the preset number in the user's database record
+    //    mongoDbOps.UpdateDocument("users", userAddress, new BsonDocument { { "preset", presetNumber } });
+    //    Console.WriteLine($"Assigned Preset {presetNumber} to user with address {userAddress}");
+    //}
+    public class Villager
 	{
 
 		public Rectangle Rect;
@@ -438,9 +485,21 @@ public class TuioDemo : Form, TuioListener
     public Button RIGHT = new Button(1750, 500, 90, 90, "RIGHT.png", "HRIGHT.png");
     public Button EXIT = new Button(1650, 100, 90, 90, "EXIT.png", "HEXIT.png");
 
-	/// <summary>
-	/// /
-	/// </summary>
+
+    /// for Admin Dashboard
+    //public Button PRESET1 = new Button(680, 200, 606, 99, "PRESET1.png", "HPRESET1.png"); // images for the presets should be created going to use a random image for now
+    //public Button PRESET2 = new Button(680, 400, 606, 99, "PRESET2.png", "HPRESET2.png");
+    //public Button PRESET3 = new Button(680, 600, 606, 99, "PRESET3.png", "HPRESET3.png");
+
+	// THESE ARE ONLY FOR TESTING AND SHOULD BE DELETED WHEN NEW IMAGES ARE CREATED
+    public Button PRESET1 = new Button(680, 200, 606, 99, "STORE.png", "HSTORE.png");
+    public Button PRESET2 = new Button(680, 400, 606, 99, "STORE.png", "HSTORE.png");
+    public Button PRESET3 = new Button(680, 600, 606, 99, "STORE.png", "HSTORE.png");
+
+
+    /// <summary>
+    /// /
+    /// </summary>
     public static int width, height;
 	private int window_width = 1920;
 	private int window_height = 1080;
@@ -736,6 +795,19 @@ public class TuioDemo : Form, TuioListener
 		else if (scene == 4)
 		{
             g.DrawImage(Image.FromFile("Gtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+        }
+        else if (scene == 5) // Admin Dashboard
+        {
+            g.DrawImage(Image.FromFile("AdminDS.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+
+            // Render Preset 1 Tasks
+            DrawPresetTasks(g, 1, 200, 200);
+
+            // Render Preset 2 Tasks
+            DrawPresetTasks(g, 2, 700, 200);
+
+            // Render Preset 3 Tasks
+            DrawPresetTasks(g, 3, 1200, 200);
         }
 
         int imgwidth = 90;

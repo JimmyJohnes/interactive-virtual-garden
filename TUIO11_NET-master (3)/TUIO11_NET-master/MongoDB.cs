@@ -30,7 +30,7 @@ namespace MongoDBOperations
             return collection.Find(new BsonDocument()).ToList();
         }
 
-        public void UpdateDocument(string collectionName, string address, int score, List<string> unlockables, List<int> phases, List<String> states,List<String> seeds)
+        public void UpdateDocument(string collectionName, string address, int score, List<string> unlockables, List<int> phases, List<String> states,List<String> seeds,int presetNumbe)
         {
             var collection = database.GetCollection<BsonDocument>(collectionName);
             var filter = Builders<BsonDocument>.Filter.Eq("address", address);
@@ -40,7 +40,9 @@ namespace MongoDBOperations
                 .Set("unlockables", new BsonArray(unlockables)) 
                 .Set("phases", new BsonArray(phases))           
                 .Set("states", new BsonArray(states))           
-                .Set("seeds", new BsonArray(seeds));
+                .Set("seeds", new BsonArray(seeds))
+                .Set("preset",new BsonInt32(presetNumbe));
+
             collection.UpdateOne(filter, update);
             Console.WriteLine("Document updated.");
         }
