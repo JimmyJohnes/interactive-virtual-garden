@@ -800,6 +800,7 @@ public class TuioDemo : Form, TuioListener
         {
             g.DrawImage(Image.FromFile("AdminDS.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
+
             // Render Preset 1 Tasks
             DrawPresetTasks(g, 1, 200, 200);
 
@@ -1446,7 +1447,45 @@ public class TuioDemo : Form, TuioListener
                             }
                         }
                     }
-					switch (tobj.SymbolID)
+
+					// choosing user in the admin dashboard
+
+                    if (scene == 5)
+                    {
+                        if (tobj.SymbolID == 9)
+                        {
+                            if (shownuser < 5)
+                            {
+                                shownuser = shownuser + 1;
+                                userLabel.Text = devices[shownuser].name;
+                            }
+                            else
+                            {
+                                shownuser = 0;
+                                userLabel.Text = devices[shownuser].name;
+
+                            }
+                            currentUser = devices[shownuser].address;
+                            Device device = new Device();
+                            device = mongoDbOps.GetUserDevice("users", currentUser);
+                            isAdmin = device.status;
+                        }
+                        if (tobj.SymbolID == 10)
+                        {
+                            if (shownuser > 0)
+                            {
+                                shownuser = shownuser - 1;
+                                userLabel.Text = devices[shownuser].name;
+                            }
+                            else
+                            {
+                                shownuser = devices.Count - 1;
+                                userLabel.Text = devices[shownuser].name;
+
+                            }
+                        }
+                    }
+                    switch (tobj.SymbolID)
 					{
 						case 0:
 							objectImagePath = Path.Combine(Environment.CurrentDirectory, "SHOVEL.png");
