@@ -7,6 +7,11 @@ import emotion
 def exec_face_recognition(image):
     encodings = recognize.read_encodings("encodings/")
     result = recognize.recogonize_face(image,encodings)
+    return result
+
+def exec_emotion_detection(image):
+    result = emotion.detect_emotion(image)
+    return result
 
 
 
