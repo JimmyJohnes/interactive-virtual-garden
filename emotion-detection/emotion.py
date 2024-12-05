@@ -3,7 +3,7 @@ from deepface import DeepFace
 import json
 
 
-img_path = ''
+img_path = '/home/user/interactive-virtual-garden/image.jpg'
 # read image
 img = cv2.imread(img_path)
 

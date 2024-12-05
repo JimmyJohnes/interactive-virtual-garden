@@ -2,7 +2,6 @@ import face_recognition
 import numpy as np
 import cam
 
-#TODO: Implement a way to dynamically figure the names of users
 
 def read_encodings(csv_dir: str):
     encodings = []
