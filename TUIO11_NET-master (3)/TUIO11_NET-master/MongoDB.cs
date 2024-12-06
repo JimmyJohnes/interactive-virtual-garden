@@ -30,23 +30,34 @@ namespace MongoDBOperations
             return collection.Find(new BsonDocument()).ToList();
         }
 
-        public void UpdateDocument(string collectionName, string address, int score, List<string> unlockables, List<int> phases, List<String> states,List<String> seeds,int presetNumbe)
+        public void UpdateDocument(string collectionName, string address, int score, List<string> unlockables, List<int> phases, List<String> states,List<String> seeds,List<int>presetStatus)
         {
             var collection = database.GetCollection<BsonDocument>(collectionName);
             var filter = Builders<BsonDocument>.Filter.Eq("address", address);
 
             var update = Builders<BsonDocument>.Update
                 .Set("score", new BsonInt32(score))
-                .Set("unlockables", new BsonArray(unlockables)) 
-                .Set("phases", new BsonArray(phases))           
-                .Set("states", new BsonArray(states))           
+                .Set("unlockables", new BsonArray(unlockables))
+                .Set("phases", new BsonArray(phases))
+                .Set("states", new BsonArray(states))
                 .Set("seeds", new BsonArray(seeds))
-                .Set("preset",new BsonInt32(presetNumbe));
+                .Set("presetStatus",new BsonArray(presetStatus));
 
             collection.UpdateOne(filter, update);
             Console.WriteLine("Document updated.");
         }
+        public void UpdatePreset(string collectionName, string address,int presetNumber)
+        {
+            var collection = database.GetCollection<BsonDocument>(collectionName);
+            var filter = Builders<BsonDocument>.Filter.Eq("address", address);
+             
+            var update = Builders<BsonDocument>.Update
+                .Set("preset", new BsonInt32(presetNumber))
+                .Set("presetStatus", new BsonArray(new List<int> { 0, 0, 0, 0, 0 }));
 
+            collection.UpdateOne(filter, update);
+            Console.WriteLine("Document updated.");
+        }
         public void DeleteDocument(string collectionName, string name)
         {
             var collection = database.GetCollection<BsonDocument>(collectionName);

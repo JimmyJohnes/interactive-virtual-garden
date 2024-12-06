@@ -43,6 +43,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 using System.Security.Cryptography.X509Certificates;
 using System.Timers;
 using System.Linq;
+using DnsClient;
 
 public class TuioDemo : Form, TuioListener
 {
@@ -104,6 +105,8 @@ public class TuioDemo : Form, TuioListener
 		public List<String> seeds {  get; set; }
 		public List<int> phases { get; set; }
 		public string status { get; set; }
+		public int preset { get; set; }
+		public List<int> presetStatus { get; set; }
 		public Device()
 		{
 			this.name = "";
@@ -113,6 +116,7 @@ public class TuioDemo : Form, TuioListener
             this.seeds = new List<string>();
             this.unlockables = new List<String>();
 			this.status = "guest";
+			this.preset = 0;
 		}
 		public Device(String name, String address, int score, List<String> unlockables)
 		{
@@ -333,18 +337,21 @@ public class TuioDemo : Form, TuioListener
 		}
 	}
 	/// gets the presets for admin dashboard
-    public List<string> GetPresetTasks(int presetNumber)
+    public List<int> GetPresetTasks(int presetNumber)
     {
+		//mapping
+        // # ['wheat','Beetroot','Carrot','Potato','Berry']
+        // # [0,0,0,0,0]
         switch (presetNumber)
         {
             case 1:
-                return new List<string> { "Water Plants", "Plant Seeds", "Harvest Crops" };
+                return new List<int> { 5, 0, 4, 6, 3 };
             case 2:
-                return new List<string> { "Remove Weeds", "Fertilize Soil", "Clean Tools" };
+                return new List<int> { 3, 4, 6, 0, 5 };
             case 3:
-                return new List<string> { "Prune Trees", "Build Fences", "Inspect Equipment" };
+                return new List<int> { 3, 0, 4, 0, 3 };
             default:
-                return new List<string> { "No tasks assigned." };
+                return new List<int> { 0, 0, 0, 0, 0 };
         }
     }
 	// draws the preset rectanges on Admin dashboard
@@ -354,10 +361,10 @@ public class TuioDemo : Form, TuioListener
         int rectWidth = 400; // Width of each task rectangle
         int rectHeight = 80; // Height of each task rectangle
         int spacing = 20; // Spacing between rectangles
-
-        // Draw the header for the preset
+		// Draw the header for the preset
         g.DrawString($"Preset {presetNumber}", new Font("Arial", 24, FontStyle.Bold), Brushes.Black, xOffset, yOffset - 50);
 
+        
         foreach (var task in tasks)
         {
             // Draw the rectangle
@@ -365,7 +372,7 @@ public class TuioDemo : Form, TuioListener
             g.DrawRectangle(Pens.Black, xOffset, yOffset, rectWidth, rectHeight);
 
             // Draw the task name inside the rectangle
-            g.DrawString(task, new Font("Arial", 16), Brushes.Black, xOffset + 10, yOffset + 25);
+            g.DrawString(task.ToString(), new Font("Arial", 16), Brushes.Black, xOffset + 10, yOffset + 25);
 
             // Move to the next rectangle position
             yOffset += rectHeight + spacing;
@@ -391,12 +398,12 @@ public class TuioDemo : Form, TuioListener
 		mongoDbOps.InsertDocument("users", document);
 	}
 	// should assign tasks to user from the admin dashboard but the update not working
-    //public void AssignPresetToUser(string userAddress, int presetNumber)
-    //{
-    //    // Save the preset number in the user's database record
-    //    mongoDbOps.UpdateDocument("users", userAddress, new BsonDocument { { "preset", presetNumber } });
-    //    Console.WriteLine($"Assigned Preset {presetNumber} to user with address {userAddress}");
-    //}
+    public void AssignPresetToUser(string userAddress, int presetNumber)
+    {
+        // Save the preset number in the user's database record
+        mongoDbOps.UpdatePreset("users", userAddress, presetNumber);
+        Console.WriteLine($"Assigned Preset {presetNumber} to user with address {userAddress}");
+    }
     public class Villager
 	{
 
@@ -463,6 +470,8 @@ public class TuioDemo : Form, TuioListener
     /// </summary>
     /// 
     public Bitmap img;
+	public List<int> presetStatus ;
+	public int preset;
 	public Rectangle src, dest;
 	public List<Pot> Pots = new List<Pot>();
 	public List<Store_Items> StoreItems = new List<Store_Items>();
@@ -648,12 +657,16 @@ public class TuioDemo : Form, TuioListener
 
     private void Timer_Tick(object sender, EventArgs e)
     {
+		if(scene == 0 || scene == 5)
+		{
+            devices = getBluetoothDevicesAndLogin();
+        }
 		if (scene == 0)
 		{
 			FaceProperties faceProperties = getFaceProperties();
 			identity = faceProperties.identity;
 			emotion = faceProperties.emotion;
-			devices = getBluetoothDevicesAndLogin();
+			
 		}
 		if (scene == 1)
 		{
@@ -666,7 +679,7 @@ public class TuioDemo : Form, TuioListener
 				seeds.Add(pot.seed);
 				states.Add(pot.State);
 			}
-			mongoDbOps.UpdateDocument("users", currentUser, Score, unlocked, phases, states, seeds);
+			mongoDbOps.UpdateDocument("users", currentUser, Score, unlocked, phases, states, seeds,presetStatus);
 		}
     }
 
@@ -799,8 +812,28 @@ public class TuioDemo : Form, TuioListener
         }
         else if (scene == 5) // Admin Dashboard
         {
+            userLabel.Visible = true;
+
+            if (devices.Count > 0)
+            {
+
+                userLabel.Text = devices[shownuser].name;
+
+            }
+            else
+            {
+                userLabel.Text = "No devices detected";
+
+            }
             g.DrawImage(Image.FromFile("AdminDS.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
+            List<string> titles = new List<string> { "Wheat", "Beetroot", "Carrot", "Potato", "Berry" };
+            int yOffsetTitle = 200;
+            foreach (var title in titles)
+            {
+                g.DrawString($"{title}", new Font("Arial", 16 , FontStyle.Bold), Brushes.White, 70 , yOffsetTitle + 30);
+                yOffsetTitle += 100;
+            }
 
             // Render Preset 1 Tasks
             DrawPresetTasks(g, 1, 200, 200);
@@ -1225,6 +1258,8 @@ public class TuioDemo : Form, TuioListener
 									Device device = new Device();
 									device = mongoDbOps.GetUserDevice("users", currentUser);
 									unlocked = device.unlockables;
+									presetStatus = device.presetStatus;
+									preset = device.preset;
 									Score = device.score;
 									Console.WriteLine("                             " + Score);
 									for(int i=0;i<4;i++)
@@ -1453,6 +1488,24 @@ public class TuioDemo : Form, TuioListener
 
                     if (scene == 5)
                     {
+                        if (tobj.SymbolID == 1)
+                        {
+                            
+                            string address = devices[shownuser].address;
+							AssignPresetToUser(address,1);
+                        }
+                        if (tobj.SymbolID == 2)
+                        {
+
+                            string address = devices[shownuser].address;
+                            AssignPresetToUser(address, 2);
+                        }
+                        if (tobj.SymbolID == 3)
+                        {
+
+                            string address = devices[shownuser].address;
+                            AssignPresetToUser(address, 3);
+                        }
                         if (tobj.SymbolID == 9)
                         {
                             if (shownuser < 5)
@@ -1466,10 +1519,7 @@ public class TuioDemo : Form, TuioListener
                                 userLabel.Text = devices[shownuser].name;
 
                             }
-                            currentUser = devices[shownuser].address;
-                            Device device = new Device();
-                            device = mongoDbOps.GetUserDevice("users", currentUser);
-                            isAdmin = device.status;
+                            
                         }
                         if (tobj.SymbolID == 10)
                         {
@@ -1488,6 +1538,7 @@ public class TuioDemo : Form, TuioListener
                     }
                     switch (tobj.SymbolID)
 					{
+						
 						case 0:
 							objectImagePath = Path.Combine(Environment.CurrentDirectory, "SHOVEL.png");
 
