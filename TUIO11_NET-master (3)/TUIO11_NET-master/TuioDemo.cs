@@ -1124,12 +1124,35 @@ public class TuioDemo : Form, TuioListener
 					    }
 						if (tobj.SymbolID == 2) // HARVEST
 						{
-						    Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
+							//mapping
+							// # ['wheat','Beetroot','Carrot','Potato','Berry']
+							// # [0,0,0,0,0]
+							Rectangle seedRect = new Rectangle(ox - size, oy - size, size, size);
 						    foreach (var pot in Pots)
 						    {
 						        if (Intersect(seedRect, pot.Rect) && pot.State == "watered" && pot.WateringNo >= 30)
 						        {
-						            pot.State = "initial";
+									if (pot.seed == "W")
+									{
+										presetStatus[0] += 1;
+									}
+									if (pot.seed == "B")
+									{
+										presetStatus[1] += 1;
+									}
+									if (pot.seed == "C")
+									{
+										presetStatus[2] += 1;
+									}
+									if (pot.seed == "P")
+									{
+										presetStatus[3] += 1;
+									}
+									if (pot.seed == "R")
+									{
+										presetStatus[4] += 1;
+									}
+									pot.State = "initial";
 									pot.WateringNo = 0;
 									pot.seed = null;
 									pot.phase = 1;
