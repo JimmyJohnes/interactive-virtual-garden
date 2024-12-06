@@ -570,7 +570,6 @@ public class TuioDemo : Form, TuioListener
 	private string currentUser; 
 	private Label displayLabel;
     private Label userLabel;
-	private Label objectInfo;
 	public int shownuser = 0;
     Font font = new Font("Minecraft", 8.0f);
 	SolidBrush fntBrush = new SolidBrush(Color.Transparent);
