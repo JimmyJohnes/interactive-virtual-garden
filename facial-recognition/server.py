@@ -5,6 +5,7 @@ import cam
 import recognize
 import emotion
 from thread_with_return_value import *
+import json
 
 
 def exec_face_recognition(image):
