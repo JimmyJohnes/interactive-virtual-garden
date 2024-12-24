@@ -5,7 +5,7 @@ def detect_objects(image):
 
     model = YOLO("best.pt")
 
-    results = model.predict(image)
+    results = model.predict(source="0",show=True)
     
     for item in results:  # Iterate through the results objects
         name = item.to_df()
