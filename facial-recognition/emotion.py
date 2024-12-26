@@ -14,7 +14,6 @@ def detect_emotion(image):
     return emotion_with_heighest_value
 
 if __name__ == "__main__":
-    # TODO: detect emotion using webcam
-    _, image = cam.capture_image
+    _, image = cam.capture_image()
     result = detect_emotion(image)
     

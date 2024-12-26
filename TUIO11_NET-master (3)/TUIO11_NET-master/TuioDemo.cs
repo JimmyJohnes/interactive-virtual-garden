@@ -135,6 +135,39 @@ public class TuioDemo : Form, TuioListener
 			this.devices = devices;
 		}
 	}
+	public String getDetectedObject()
+	{
+	
+            String ip = "127.0.0.1";
+            int port = 3002;
+            IPAddress ipAddr = IPAddress.Parse(ip);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+            Socket sender = new Socket(ipAddr.AddressFamily,
+			SocketType.Stream, ProtocolType.Tcp);
+            string Response = "";
+
+            try
+            {
+	
+                sender.Connect(localEndPoint);
+                Console.WriteLine($"Socket connected to {ip}:{port}");
+	
+                byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+                int byteSent = sender.Send(messageSent);
+	
+                byte[] messageReceived = new byte[5024];
+	
+                int byteRecv = sender.Receive(messageReceived);
+	
+                Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+                return Response;
+            }
+            catch
+            {
+	
+            }
+            return Response;
+	}
 	public FaceProperties getFaceProperties()
 	{
 	
@@ -487,6 +520,7 @@ public class TuioDemo : Form, TuioListener
     public Button STORE = new Button(1170, 70, 273, 99, "STORE.png", "HSTORE.png");
     List<Device> devices = new List<Device>();
 	public string identity;
+	public string detectedObject = "";
 	public string emotion;
 	
     public Button RETURN = new Button(470, 70, 273, 99, "RETURN.png", "HRETURN.png");
@@ -693,6 +727,10 @@ public class TuioDemo : Form, TuioListener
 			}
 			mongoDbOps.UpdateDocument("users", currentUser, Score, unlocked, phases, states, seeds,presetStatus);
 		}
+		if (scene == 6)
+		{
+			detectedObject = getDetectedObject();
+		}
     }
 
 
@@ -820,6 +858,32 @@ public class TuioDemo : Form, TuioListener
 		{
 
 			g.DrawImage(Image.FromFile("TUIOtutorial.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+		}
+		else if (scene == 6)
+		{
+			g.DrawImage(Image.FromFile("DirtBackground.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
+			if (detectedObject == "shovel")
+			{
+                g.DrawImage(Image.FromFile("SHOVEL.png"), new Point(870, 25));
+                g.DrawString("Used on pots to help seed them", new Font("Arial", 72.0f), Brushes.White, new Point(300, 300));
+
+			}
+			if (detectedObject == "bucket")
+			{
+                g.DrawImage(Image.FromFile("WATER.PNG"), new Point(870, 25));
+                g.DrawString("Used to water seeds ", new Font("Arial", 72.0f), Brushes.White, new Point(300, 300));
+
+			}
+			if (detectedObject == "rake")
+			{
+                g.DrawImage(Image.FromFile("H2.PNG"), new Point(870, 25));
+                g.DrawString("Used to harvest grown crops", new Font("Arial", 72.0f), Brushes.White, new Point(300, 300));
+
+			}
+			if(detectedObject == "None" || detectedObject == "")
+			{
+                g.DrawString("Please put one of the tools in front of\n the camera to know more about it", new Font("Arial", 36.0f), Brushes.White, new Point(600, 300));
+			}
 		}
 		else if (scene == 4)
 		{
