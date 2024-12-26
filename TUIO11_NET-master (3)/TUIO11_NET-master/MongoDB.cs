@@ -96,7 +96,10 @@ namespace MongoDBOperations
                 seeds = document.Contains("seeds") ? document["seeds"].AsBsonArray.Select(s => s.AsString).ToList() : new List<string>(),
                 states = document.Contains("states") ? document["states"].AsBsonArray.Select(s => s.AsString).ToList() : new List<string>(),
                 phases = document.Contains("phases") ? document["phases"].AsBsonArray.Select(p => p.AsInt32).ToList() : new List<int>(),
-                status = document.Contains("status") ? document["status"].AsString : ""  
+                presetStatus = document.Contains("presetStatus") ? document["presetStatus"].AsBsonArray.Select(p => p.AsInt32).ToList() : new List<int>(),
+                status = document.Contains("status") ? document["status"].AsString : ""  ,
+                preset = document.Contains("preset") ? document["preset"].AsInt32 : 0,
+
             };
 
             return device;

@@ -117,6 +117,7 @@ public class TuioDemo : Form, TuioListener
             this.unlockables = new List<String>();
 			this.status = "guest";
 			this.preset = 0;
+			this.presetStatus = new List<int>();
 		}
 		public Device(String name, String address, int score, List<String> unlockables)
 		{
@@ -381,7 +382,7 @@ public class TuioDemo : Form, TuioListener
 
     //string connectionString = "mongodb+srv://omarhani423:GcX8zgZnPP9TCHBD@cluster0.eqr9u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private MongoDBHandler mongoDbOps = new MongoDBHandler("mongodb+srv://abdelrahmannader:callofdirt1@cluster0.ytujf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "Vitrula-garden");
-	public int scene = 5;
+	public int scene = 0;
 
 	public Bitmap small_shovel;
 	public Bitmap objectImage;
@@ -536,7 +537,8 @@ public class TuioDemo : Form, TuioListener
 	private string currentUser; 
 	private Label displayLabel;
     private Label userLabel;
-	public int shownuser = 0;
+    private Label presetLabel;
+    public int shownuser = 0;
     Font font = new Font("Minecraft", 8.0f);
 	SolidBrush fntBrush = new SolidBrush(Color.Transparent);
 	SolidBrush bgrBrush = new SolidBrush(Color.FromArgb(0, 0, 64));
@@ -616,6 +618,16 @@ public class TuioDemo : Form, TuioListener
 		userLabel.AutoSize = true;
         userLabel.TextAlign = ContentAlignment.MiddleCenter;
         this.Controls.Add(userLabel);
+
+        presetLabel = new Label();
+        presetLabel.Text = Score.ToString();
+        BackColor = Color.White;
+        presetLabel.Location = new System.Drawing.Point(1920 / 2, 910);
+        presetLabel.MinimumSize = new System.Drawing.Size(100, 50);
+        presetLabel.Font = new Font("Minecraft", 15);
+        presetLabel.AutoSize = true;
+        presetLabel.TextAlign = ContentAlignment.MiddleCenter;
+        this.Controls.Add(presetLabel);
 
         verbose = true;
 		fullscreen = true;
@@ -792,11 +804,14 @@ public class TuioDemo : Form, TuioListener
         }
         else if (scene == 1)
 		{
+			presetLabel.Visible = true;
+
             if (isNightTime == false) g.DrawImage(Image.FromFile("FARM.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
             else g.DrawImage(Image.FromFile("NFARM.jpg"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
         }
         else if (scene == 2)
 		{
+			presetLabel.Visible = false;
 			g.DrawImage(Image.FromFile("WALL.png"), new Rectangle(new Point(0, 0), new Size(this.Width, this.Height)));
 
 		}
@@ -851,6 +866,7 @@ public class TuioDemo : Form, TuioListener
 		if (scene == 1 || scene == 2)
 		{            
             displayLabel.Visible = true;
+
 		}
 		else
 		{
@@ -859,12 +875,15 @@ public class TuioDemo : Form, TuioListener
 
 		if(scene ==0)
 		{
+
             if (START.type == "unselected")
             {
+
                 g.DrawImage(Image.FromFile(START.unselected_img), new Rectangle(new Point(START.x, START.y), new Size(START.width, START.height)));
             }
             else
             {
+
                 g.DrawImage(Image.FromFile(START.selected_img), new Rectangle(new Point(START.x, START.y), new Size(START.width, START.height)));
             }
 			if (isAdmin == "guest")
@@ -923,6 +942,18 @@ public class TuioDemo : Form, TuioListener
 		
 		else if (scene == 1)
 		{
+			string status_string = "";
+			foreach( var status in presetStatus)
+			{
+				status_string = status_string + " " + status.ToString(); 
+			}
+			string preset_string = "";
+			List<int> Tasks = GetPresetTasks(preset);
+            foreach (var preset_in_string in Tasks)
+			{
+				preset_string = preset_string + " " + preset_in_string.ToString();
+			}
+            presetLabel.Text = "current status:" + status_string + " Goal:" + preset_string;
             displayLabel.Location = new System.Drawing.Point(1920 / 2 +20, 55);
 
             if (STORE.type == "unselected")
