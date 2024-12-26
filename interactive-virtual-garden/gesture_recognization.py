@@ -1,7 +1,7 @@
 import pickle
 import socket
 import threading
-from dollarpy import Template, Recognizer
+from dollarpy import Template, Recognizer, Point
 import mediapipe as mp
 import cv2
 from collections import namedtuple
@@ -11,8 +11,6 @@ mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 mp_draw = mp.solutions.drawing_utils
 
-# Define a Point structure
-Point = namedtuple('Point', ['x', 'y', 'id', 'stroke_id'])
 
 # Load templates with pickle
 def load_templates(filename="templates.pkl"):
@@ -41,51 +39,80 @@ def recognize_gesture(client_socket):
     templates = load_templates()
     
     # Initialize Recognizer with loaded templates
+    # Initialize Recognizer with loaded templates
     recognizer = Recognizer(templates)
-
-    # Start webcam capture
     cap = cv2.VideoCapture(0)
-    with mp.solutions.holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+    
+    buffer = []  # Buffer to store points
+    buffer_size = 40  # Number of frames to store in the buffer
+    
+    with mp_hands.Hands(
+        static_image_mode=False,  # For video, set to False
+        max_num_hands=2,  # Process one hand at a time for gesture recognition
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5,
+    ) as hands:
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
                 break
 
-            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            image.flags.writeable = False        
-            results = holistic.process(image)
-            image.flags.writeable = True   
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            # Convert the frame to RGB
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            # Get hand landmarks points from the current frame
-            points = []
-            if results.right_hand_landmarks:
-                for i in range(21):
-                    points.append(Point(results.right_hand_landmarks.landmark[i].x, results.right_hand_landmarks.landmark[i].y, i, 0))
-            if results.left_hand_landmarks:
-                for i in range(21):
-                    points.append(Point(results.left_hand_landmarks.landmark[i].x, results.left_hand_landmarks.landmark[i].y, i, 0))
+            # Process the frame and detect hands
+            results = hands.process(rgb_frame)
 
-            if points:
-                current_template = Template("CurrentGesture", points)
-                match_name, score = recognizer.recognize(current_template)
+            if results.multi_hand_landmarks:
+                for hand_landmarks in results.multi_hand_landmarks:
+                    frame_points = []
+                    for landmark in hand_landmarks.landmark:
+                        # Collect (x, y) positions as Points
+                        frame_points.append(Point(landmark.x, landmark.y))
 
-                # Display the match and confidence score
-                cv2.putText(image, f"Match: {match_name} (Score: {score:.2f})",
-                            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    # Update the buffer with the latest points
+                    buffer.append(frame_points)
+                    if len(buffer) > buffer_size:
+                        buffer.pop(0)  # Remove the oldest frame when buffer is full
 
-                # Send recognition result to C# client
-                try:
-                    client_socket.send(f"Match: {match_name} (Score: {score:.2f})".encode('utf-8'))
-                except Exception as e:
-                    print("Error sending data to C# client:", e)
-                    break
+                    # Attempt recognition when the buffer is full
+                    if len(buffer) == buffer_size:
+                        # Flatten the buffer into a single list of points
+                        gesture_points = [point for frame in buffer for point in frame]
+                        result , score = recognizer.recognize(gesture_points)
+                        
+                        if result:
+                            print(f"Recognized gesture: {result} with score {score}")
+                        else:
+                            print("No gesture recognized")
+                        
+                        buffer = []
 
-            # Show the live video feed with recognition result
-            cv2.imshow("Hand Gesture Recognition", image)
+                        try:
+                            client_socket.send(f"{result}".encode('utf-8'))
+                        except Exception as e:
+                            print("Error sending data to C# client:", e)
+                        
 
-            if cv2.waitKey(10) & 0xFF == ord('q'):
+                    # Draw hand landmarks on the frame
+                    mp_draw.draw_landmarks(
+                        frame,
+                        hand_landmarks,
+                        mp_hands.HAND_CONNECTIONS,
+                        mp_draw.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),
+                        mp_draw.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2),
+                    )
+
+            # Display the frame
+            cv2.imshow("Hand Landmarks Detection", frame)
+
+            # Exit on pressing 'q'
+            if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
 
     # Release resources
     cap.release()

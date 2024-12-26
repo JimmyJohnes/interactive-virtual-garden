@@ -111,80 +111,80 @@ namespace CSharpClient
                 this.position = position;//left or go right
             }
         }
-        public List<Device> getBluetoothDevicesAndLogin()
-        {
-            List<Device> devices = new List<Device>();
-            try
-            {
+        //public List<Device> getBluetoothDevicesAndLogin()
+        //{
+        //    List<Device> devices = new List<Device>();
+        //    try
+        //    {
 
-                String ip = "127.0.0.1";
-                int port = 3000;
-                IPAddress ipAddr = IPAddress.Parse(ip);
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
-                Socket sender = new Socket(ipAddr.AddressFamily,
-                          SocketType.Stream, ProtocolType.Tcp);
+        //        String ip = "127.0.0.1";
+        //        int port = 3000;
+        //        IPAddress ipAddr = IPAddress.Parse(ip);
+        //        IPEndPoint localEndPoint = new IPEndPoint(ipAddr, port);
+        //        Socket sender = new Socket(ipAddr.AddressFamily,
+        //                  SocketType.Stream, ProtocolType.Tcp);
 
-                try
-                {
+        //        try
+        //        {
 
-                    sender.Connect(localEndPoint);
-                    Console.WriteLine($"Socket connected to {ip}:{port}");
+        //            sender.Connect(localEndPoint);
+        //            Console.WriteLine($"Socket connected to {ip}:{port}");
 
-                    byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
-                    int byteSent = sender.Send(messageSent);
+        //            byte[] messageSent = Encoding.ASCII.GetBytes("Test Client<EOF>");
+        //            int byteSent = sender.Send(messageSent);
 
-                    byte[] messageReceived = new byte[5024];
+        //            byte[] messageReceived = new byte[5024];
 
-                    int byteRecv = sender.Receive(messageReceived);
+        //            int byteRecv = sender.Receive(messageReceived);
 
-                    String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
-                    DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
-                    if (deviceJson?.devices != null)
-                    {
-                        foreach (Device device in deviceJson.devices)
-                        {
-                            Console.WriteLine("response:" + device.name + " " + device.address);
-                            if (mongoDbOps.DoesAddressExist("users", device.address))
-                            {
-                                Console.WriteLine($"Device with address {device.address} Logged in.");
-                                devices.Add(device);
-                            }
-                            else
-                            {
-                                var document = new BsonDocument
-                         {
-                                {"name",device.name },{ "address", device.address}
-                        };
-                                mongoDbOps.InsertDocument("users", document);
-                                Console.WriteLine($"Device with address {device.address} inserted.");
-                                Console.WriteLine($"Device with address {device.address} is not registered.");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No devices found in the JSON response.");
-                    }
-                    Console.WriteLine(deviceJson.devices.Count);
-                    Console.WriteLine("recieved");
-                    foreach (Device device in deviceJson.devices)
-                    {
-                        Console.WriteLine($"name:{device.name}, address: {device.address}");
-                    }
+        //            String Response = Encoding.ASCII.GetString(messageReceived, 0, byteRecv);
+        //            DeviceJson deviceJson = JsonSerializer.Deserialize<DeviceJson>(Response);
+        //            if (deviceJson?.devices != null)
+        //            {
+        //                foreach (Device device in deviceJson.devices)
+        //                {
+        //                    Console.WriteLine("response:" + device.name + " " + device.address);
+        //                    if (mongoDbOps.DoesAddressExist("users", device.address))
+        //                    {
+        //                        Console.WriteLine($"Device with address {device.address} Logged in.");
+        //                        devices.Add(device);
+        //                    }
+        //                    else
+        //                    {
+        //                        var document = new BsonDocument
+        //                 {
+        //                        {"name",device.name },{ "address", device.address}
+        //                };
+        //                        mongoDbOps.InsertDocument("users", document);
+        //                        Console.WriteLine($"Device with address {device.address} inserted.");
+        //                        Console.WriteLine($"Device with address {device.address} is not registered.");
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                Console.WriteLine("No devices found in the JSON response.");
+        //            }
+        //            Console.WriteLine(deviceJson.devices.Count);
+        //            Console.WriteLine("recieved");
+        //            foreach (Device device in deviceJson.devices)
+        //            {
+        //                Console.WriteLine($"name:{device.name}, address: {device.address}");
+        //            }
 
-                    sender.Shutdown(SocketShutdown.Both);
-                    sender.Close();
-                    return devices;
-                }
-                catch
-                {
+        //            sender.Shutdown(SocketShutdown.Both);
+        //            sender.Close();
+        //            return devices;
+        //        }
+        //        catch
+        //        {
 
-                }
+        //        }
 
-            }
-            catch { }
-            return devices;
-        }
+        //    }
+        //    catch { }
+        //    return devices;
+        //}
         public DeviceJson getBluetoothDevicesAndUploadToDatabase()
         {
 
@@ -296,7 +296,7 @@ namespace CSharpClient
         int Score = 0, Currentitem = 0, CurrentPot = 0, Currentdevice = 0;
         float deltaTime, hold_timer = 0, Blue_Buf = 0;
         long error_Timer = 0, lastTime;
-        string error_msg = "", command = "", mode = "Welcome", currentUser, msg = "", last_msg = "", Currentseed = "W", current_Item;
+        string error_msg = "", command = "", mode = "Farm", currentUser, msg = "", last_msg = "", Currentseed = "W", current_Item;
         bool Connection_status;
         Label scoreLabel;
         Point Farm = new Point(1920 / 2 + 20, 55), Store = new Point(1920 / 2, 895);
@@ -335,7 +335,7 @@ namespace CSharpClient
                 {
 
                     Blue_Buf = 0;
-                    devices = getBluetoothDevicesAndLogin();
+                    //devices = getBluetoothDevicesAndLogin();
                 }
                 else
                 {
@@ -345,19 +345,20 @@ namespace CSharpClient
         }
         void buffer()
         {
-            if (last_msg != msg)
-            {
-                hold_timer = 0;
-            }
-            else
-            {
-                hold_timer += deltaTime;
-                if (hold_timer > 0.1)
-                {
-                    command = msg;
-                    hold_timer = 0;
-                }
-            }
+            command = msg;
+            //if (last_msg != msg)
+            //{
+            //    hold_timer = 0;
+            //}
+            //else
+            //{
+            //    hold_timer += deltaTime;
+            //    if (hold_timer > 0.1)
+            //    {
+            //        command = msg;
+            //        hold_timer = 0;
+            //    }
+            //}
         }
         void menuHandler()
         {
@@ -371,7 +372,7 @@ namespace CSharpClient
             tt.Start();
             load_pots();
             Load_store();
-            devices = getBluetoothDevicesAndLogin();
+            //devices = getBluetoothDevicesAndLogin();
         }
         void Load_store()
         {
@@ -433,7 +434,7 @@ namespace CSharpClient
                 case "Welcome":
                     switch (command)
                     {
-                        case "harvest":
+                        case "interact":
                             load_user();
                             mode = "Farm";
                             break;
@@ -456,7 +457,7 @@ namespace CSharpClient
                         case "right":
                             Select(1, 4, ref Currentitem);
                             break;
-                        case "harvest":
+                        case "interact":
                             current_Item = StoreItems[Currentitem].type;
                             if (Score - StoreItems[Currentitem].price >= 0 && !unlocked.Contains(current_Item))
                             {
@@ -484,7 +485,7 @@ namespace CSharpClient
                         case "right":
                             Select(1, 3, ref CurrentPot);
                             break;
-                        case "harvest":
+                        case "interact":
                             if (PotList[CurrentPot].State == "initial")
                             {
                                 PotList[CurrentPot].State = "dug";
@@ -524,8 +525,6 @@ namespace CSharpClient
                                     PotList[CurrentPot].WateringNo++;
                                 }
                             }
-                            break;
-                        case "hoe":
                             if (PotList[CurrentPot].State == "watered" && PotList[CurrentPot].WateringNo >= 3)
                             {
                                 PotList[CurrentPot].State = "initial";
@@ -558,7 +557,7 @@ namespace CSharpClient
                 seeds.Add(pot.seed);
                 states.Add(pot.State);
             }
-            mongoDbOps.UpdateDocument("users", currentUser, Score, unlocked, phases, states, seeds);
+            //mongoDbOps.UpdateDocument("users", currentUser, Score, unlocked, phases, states, seeds);
         }
         void load_user()
         {
